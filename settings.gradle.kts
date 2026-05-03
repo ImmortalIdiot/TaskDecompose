@@ -23,4 +23,6 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "TaskDecompose"
 include(":app")
-
+include(":domain")
+include(":data")
+include(":presentation")
