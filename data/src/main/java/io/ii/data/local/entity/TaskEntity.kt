@@ -27,7 +27,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-data class TaskEntity(
+internal data class TaskEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "parent_id") val parentId: String?,
     val title: String,

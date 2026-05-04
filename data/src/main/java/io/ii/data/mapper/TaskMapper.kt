@@ -12,7 +12,7 @@ import io.ii.domain.model.Task
  * @param parentId идентификатор родительской задачи. Для корневой задачи равен null
  * @return сущность задачи для хранения в базе данных
  */
-fun Task.toEntity(parentId: String? = null): TaskEntity =
+internal fun Task.toEntity(parentId: String? = null): TaskEntity =
     TaskEntity(
         id = id,
         parentId = parentId,
@@ -29,7 +29,7 @@ fun Task.toEntity(parentId: String? = null): TaskEntity =
  * @param parentId идентификатор родительской задачи. Для корневой задачи - null
  * @return список сущностей, включающий текущую задачу и все вложенные подзадачи
  */
-fun Task.toEntities(parentId: String? = null): List<TaskEntity> = listOf(
+internal fun Task.toEntities(parentId: String? = null): List<TaskEntity> = listOf(
     toEntity(parentId)
 ) + subtasks.flatMap {
     it.toEntities(parentId = id)
@@ -42,7 +42,7 @@ fun Task.toEntities(parentId: String? = null): List<TaskEntity> = listOf(
  *
  * @return список корневых задач с вложенными подзадачами
  */
-fun List<TaskEntity>.toModelTree(): List<Task> {
+internal fun List<TaskEntity>.toModelTree(): List<Task> {
     val childrenByParent = groupBy { it.parentId }
 
     return childrenByParent[null]
@@ -60,7 +60,7 @@ fun List<TaskEntity>.toModelTree(): List<Task> {
  * @param id идентификатор задачи
  * @return задача с вложенными подзадачами или null, если задача не найдена
  */
-fun List<TaskEntity>.toModel(id: String): Task? {
+internal fun List<TaskEntity>.toModel(id: String): Task? {
     val entityById = associateBy { it.id }
     val childrenByParent = groupBy { it.parentId }
 
