@@ -1,6 +1,8 @@
 package io.ii.data.mapper
 
 import io.ii.data.local.entity.TaskEntity
+import io.ii.data.remote.dto.SubtaskDto
+import io.ii.data.repository.TaskCreator
 import io.ii.domain.model.Task
 
 /**
@@ -107,5 +109,21 @@ private fun TaskEntity.toModel(
     )
 }
 
-// TODO: add mapping domain to request (by prompt builder)
-// TODO: add mapping response to domain
+/**
+ * Преобразует список DTO подзадач, полученных от API, в список доменных моделей [Task].
+ *
+ * Используется после получения ответа от модели. Каждой подзадаче
+ * назначается новый идентификатор и время создания.
+ *
+ * @return список доменных подзадач
+ */
+internal fun List<SubtaskDto>.toSubtasks(): List<Task> = map(TaskCreator::createSubtask)
+
+/**
+ * Обновляет исходную задачу, добавляя в неё подзадачи,
+ * полученные от модели.
+ *
+ * @param subtasks список DTO подзадач
+ * @return новая задача с заполненным списком подзадач
+ */
+internal fun Task.withSubtasks(subtasks: List<SubtaskDto>): Task = copy(subtasks = subtasks.toSubtasks())

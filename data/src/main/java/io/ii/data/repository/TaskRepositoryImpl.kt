@@ -6,13 +6,16 @@ import io.ii.data.local.dao.TaskDao
 import io.ii.data.mapper.toEntities
 import io.ii.data.mapper.toModel
 import io.ii.data.mapper.toModelTree
+import io.ii.data.remote.api.GigaChatApi
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
+import io.ktor.client.HttpClient
 
 internal class TaskRepositoryImpl(
     private val dao: TaskDao,
-    private val db: TaskDatabase
+    private val db: TaskDatabase,
+    private val api: GigaChatApi
 ) : TaskRepository {
 
     override suspend fun decomposeTask(

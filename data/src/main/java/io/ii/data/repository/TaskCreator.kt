@@ -1,5 +1,6 @@
 package io.ii.data.repository
 
+import io.ii.data.remote.dto.SubtaskDto
 import io.ii.domain.model.Task
 import java.util.UUID
 
@@ -21,6 +22,26 @@ internal object TaskCreator {
             title = title,
             description = description,
             createdAt = setCreationTimeMillis()
+        )
+    }
+
+    /**
+     * Создаёт доменную модель подзадачи на основе DTO.
+     *
+     * Рекурсивно преобразует вложенные подзадачи, формируя древовидную структуру.
+     * Для каждой подзадачи генерируется новый идентификатор и устанавливается
+     * текущее время создания.
+     *
+     * @param dto DTO подзадачи, полученной от API
+     * @return доменная модель подзадачи
+     */
+    fun createSubtask(dto: SubtaskDto): Task {
+        return Task(
+            id = createTaskId(),
+            title = dto.title,
+            description = null,
+            createdAt = setCreationTimeMillis(),
+            subtasks = dto.subtasks.map(::createSubtask)
         )
     }
 

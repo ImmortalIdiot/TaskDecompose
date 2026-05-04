@@ -19,20 +19,15 @@ internal object PromptBuilder {
             appendLine("Ты декомпозируешь пользовательскую задачу на подзадачи.")
             appendLine("Верни ответ строго в JSON без Markdown и дополнительных пояснений.")
             appendLine()
-            appendLine("Формат ответа:")
+            appendLine("Формат ответа — JSON-массив:")
             appendLine(
                 """
-                {
-                  "title": "string",
-                  "description": "string|null",
-                  "subtasks": [
-                    {
-                      "title": "string",
-                      "description": "string|null",
-                      "subtasks": []
-                    }
-                  ]
-                }
+                [
+                  {
+                    "title": "string",
+                    "subtasks": []
+                  }
+                ]
                 """.trimIndent()
             )
 
@@ -46,7 +41,13 @@ internal object PromptBuilder {
             appendLine("depth: ${params.depth}")
 
             appendLine()
-            appendLine("Дополнительные требования:")
+            appendLine("Требования:")
+            appendLine("- Верни только JSON-массив.")
+            appendLine("- Не добавляй корневую задачу в ответ.")
+            appendLine("- В ответе должны быть только подзадачи исходной задачи.")
+            appendLine("- Каждый элемент массива должен содержать только поля title и subtasks.")
+            appendLine("- Поле title должно быть непустой строкой.")
+            appendLine("- Поле subtasks должно быть массивом. Если вложенных подзадач нет, верни пустой массив.")
             appendLine("- Глубина вложенности subtasks не должна превышать ${params.depth}.")
             appendLine("- Каждая подзадача должна быть конкретным действием.")
             appendLine("- Сохрани смысл исходной задачи.")
