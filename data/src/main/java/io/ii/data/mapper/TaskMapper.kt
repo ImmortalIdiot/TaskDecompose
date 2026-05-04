@@ -110,20 +110,14 @@ private fun TaskEntity.toModel(
 }
 
 /**
- * Преобразует список DTO подзадач, полученных от API, в список доменных моделей [Task].
+ * Преобразует список DTO подзадач в доменную модель задачи.
  *
- * Используется после получения ответа от модели. Каждой подзадаче
- * назначается новый идентификатор и время создания.
+ * Исходная задача сохраняет свои основные данные, а список её подзадач
+ * заполняется на основе ответа API.
  *
- * @return список доменных подзадач
+ * @param originalTask исходная задача
+ * @return задача с заполненным списком подзадач
  */
-internal fun List<SubtaskDto>.toSubtasks(): List<Task> = map(TaskCreator::createSubtask)
-
-/**
- * Обновляет исходную задачу, добавляя в неё подзадачи,
- * полученные от модели.
- *
- * @param subtasks список DTO подзадач
- * @return новая задача с заполненным списком подзадач
- */
-internal fun Task.withSubtasks(subtasks: List<SubtaskDto>): Task = copy(subtasks = subtasks.toSubtasks())
+internal fun List<SubtaskDto>.toModel(originalTask: Task): Task {
+    return originalTask.copy(subtasks = map(TaskCreator::createSubtask))
+}

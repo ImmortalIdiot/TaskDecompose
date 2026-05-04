@@ -10,7 +10,6 @@ import io.ii.data.remote.api.GigaChatApi
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
-import io.ktor.client.HttpClient
 
 internal class TaskRepositoryImpl(
     private val dao: TaskDao,
@@ -24,7 +23,9 @@ internal class TaskRepositoryImpl(
         params: DecompositionParams
     ): Task {
         val newTask = TaskCreator.createTask(title = taskTitle, description = taskDescription)
-        TODO("Build prompt, pass task and params to it, pass to api, get and parse result, save it to db and return")
+        val prompt = PromptBuilder.build(task = newTask, params = params)
+
+        return api.decomposeTask(prompt).toModel(newTask)
     }
 
     override suspend fun loadDecompositionHistory(): List<Task> {
