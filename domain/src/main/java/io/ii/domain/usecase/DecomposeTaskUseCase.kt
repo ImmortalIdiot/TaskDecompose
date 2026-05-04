@@ -7,9 +7,8 @@ import io.ii.domain.repository.TaskRepository
 /**
  * Use case для декомпозиции задачи.
  *
- * Выполняет разбиение исходной задачи на подзадачи с использованием
- * заданных параметров декомпозиции. Делегирует выполнение операции
- * репозиторию.
+ * Выполняет разбиение исходной задачи на подзадачи
+ * с использованием заданных параметров декомпозиции. Делегирует выполнение операции репозиторию.
  *
  * @property repository репозиторий задач
  */
@@ -25,7 +24,8 @@ class DecomposeTaskUseCase(
      */
     override suspend fun execute(params: Params): Task =
         repository.decomposeTask(
-            task = params.task,
+            taskTitle = params.taskTitle,
+            taskDescription = params.taskDescription,
             params = params.decompositionParams
         )
 
@@ -36,7 +36,8 @@ class DecomposeTaskUseCase(
      * @property decompositionParams параметры декомпозиции
      */
     data class Params(
-        val task: Task,
+        val taskTitle: String,
+        val taskDescription: String?,
         val decompositionParams: DecompositionParams
     )
 }

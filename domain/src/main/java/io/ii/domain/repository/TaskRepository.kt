@@ -19,12 +19,14 @@ interface TaskRepository {
      *
      * На основе исходной задачи и заданных параметров формирует набор подзадач.
      *
-     * @param task исходная задача
+     * @param taskTitle текст исходной задачи, введенный пользователем
+     * @param taskDescription возможное описание задачи, введенное пользователем
      * @param params параметры декомпозиции
      * @return задача с заполненным списком подзадач
      */
     suspend fun decomposeTask(
-        task: Task,
+        taskTitle: String,
+        taskDescription: String?,
         params: DecompositionParams
     ): Task
 

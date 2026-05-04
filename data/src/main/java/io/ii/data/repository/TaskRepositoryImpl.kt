@@ -16,9 +16,11 @@ internal class TaskRepositoryImpl(
 ) : TaskRepository {
 
     override suspend fun decomposeTask(
-        task: Task,
+        taskTitle: String,
+        taskDescription: String?,
         params: DecompositionParams
     ): Task {
+        val newTask = TaskCreator.createTask(title = taskTitle, description = taskDescription)
         TODO("Build prompt, pass task and params to it, pass to api, get and parse result, save it to db and return")
     }
 
