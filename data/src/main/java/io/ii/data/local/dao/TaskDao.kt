@@ -23,13 +23,23 @@ internal interface TaskDao {
     suspend fun getAllTasks(): List<TaskEntity>
 
     /**
-     * Возвращает задачу по её идентификатору.
+     * Возвращает задачу по её идентификатору со всеми подзадачами.
      *
      * @param id идентификатор задачи
      * @return задача или null, если задача не найдена
      */
-    @Query("SELECT * FROM tasks where id = :id")
-    suspend fun getTaskById(id: String): TaskEntity?
+    @Query(
+        """
+        WITH RECURSIVE task_tree AS (
+        SELECT * FROM tasks WHERE id = :id
+        UNION ALL
+        SELECT child.* FROM tasks AS child
+            INNER JOIN task_tree AS parent ON child.parent_id = parent.id
+        )
+        SELECT * FROM task_tree
+    """
+    )
+    suspend fun getTaskTreeById(id: String): List<TaskEntity>
 
     /**
      * Сохраняет или обновляет список задач.
