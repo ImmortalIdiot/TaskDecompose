@@ -1,0 +1,65 @@
+package io.ii.data.repository
+
+import io.ii.domain.model.DecompositionParams
+import io.ii.domain.model.Task
+
+/**
+* Строит промпт для декомпозиции задачи.
+*
+* Формирует строку с описанием задачи и параметрами декомпозиции,
+* которую можно передать языковой модели для получения структуры подзадач.
+*/
+internal object PromptBuilder {
+
+    fun build(
+        task: Task,
+        params: DecompositionParams
+    ): String {
+        return buildString {
+            appendLine("Ты декомпозируешь пользовательскую задачу на подзадачи.")
+            appendLine("Верни ответ строго в JSON без Markdown и дополнительных пояснений.")
+            appendLine()
+            appendLine("Формат ответа:")
+            appendLine(
+                """
+                {
+                  "title": "string",
+                  "description": "string|null",
+                  "subtasks": [
+                    {
+                      "title": "string",
+                      "description": "string|null",
+                      "subtasks": []
+                    }
+                  ]
+                }
+                """.trimIndent()
+            )
+
+            appendLine()
+            appendLine("Исходная задача:")
+            appendLine("title: ${task.title}")
+            appendLine("description: ${task.description ?: "null"}")
+
+            appendLine()
+            appendLine("Параметры декомпозиции:")
+            appendLine("depth: ${params.depth}")
+
+            appendLine()
+            appendLine("Дополнительные требования:")
+            appendLine("- Глубина вложенности subtasks не должна превышать ${params.depth}.")
+            appendLine("- Каждая подзадача должна быть конкретным действием.")
+            appendLine("- Сохрани смысл исходной задачи.")
+            appendLine("- Не добавляй Markdown.")
+            appendLine("- Не добавляй пояснения вне JSON.")
+
+            if (params.hasPriority) {
+                appendLine("- Учитывай приоритетность при порядке подзадач: более важные подзадачи должны идти раньше.")
+            }
+
+            if (params.hasTimeEstimation) {
+                appendLine("- Учитывай примерную длительность выполнения при детализации подзадач, но не добавляй отдельное поле времени.")
+            }
+        }
+    }
+}
