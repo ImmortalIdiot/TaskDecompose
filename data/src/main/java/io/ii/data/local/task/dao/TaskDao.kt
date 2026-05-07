@@ -1,10 +1,10 @@
-package io.ii.data.local.dao
+package io.ii.data.local.task.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import io.ii.data.local.entity.TaskEntity
+import io.ii.data.local.task.entity.TaskEntity
 
 /**
  * DAO-интерфейс для работы с задачами в базе данных.

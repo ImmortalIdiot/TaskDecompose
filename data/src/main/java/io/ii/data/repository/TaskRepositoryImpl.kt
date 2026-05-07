@@ -1,12 +1,14 @@
 package io.ii.data.repository
 
 import androidx.room.withTransaction
-import io.ii.data.local.TaskDatabase
-import io.ii.data.local.dao.TaskDao
+import io.ii.data.local.task.TaskDatabase
+import io.ii.data.local.task.dao.TaskDao
+import io.ii.data.local.token.AccessTokenStorage
 import io.ii.data.mapper.toEntities
 import io.ii.data.mapper.toModel
 import io.ii.data.mapper.toModelTree
 import io.ii.data.remote.api.GigaChatApi
+import io.ii.data.remote.dto.GigaChatAccessToken
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
@@ -14,7 +16,8 @@ import io.ii.domain.repository.TaskRepository
 internal class TaskRepositoryImpl(
     private val dao: TaskDao,
     private val db: TaskDatabase,
-    private val api: GigaChatApi
+    private val api: GigaChatApi,
+    private val tokenStorage: AccessTokenStorage
 ) : TaskRepository {
 
     override suspend fun decomposeTask(
@@ -47,5 +50,12 @@ internal class TaskRepositoryImpl(
 
     override suspend fun deleteTask(id: String) {
         dao.deleteTaskById(id)
+    }
+
+    private suspend fun authorize(): GigaChatAccessToken {
+        val token = api.authorize()
+        tokenStorage.saveToken(token)
+
+        return token
     }
 }

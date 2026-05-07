@@ -1,9 +1,9 @@
-package io.ii.data.local
+package io.ii.data.local.task
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import io.ii.data.local.dao.TaskDao
-import io.ii.data.local.entity.TaskEntity
+import io.ii.data.local.task.dao.TaskDao
+import io.ii.data.local.task.entity.TaskEntity
 
 
 /**

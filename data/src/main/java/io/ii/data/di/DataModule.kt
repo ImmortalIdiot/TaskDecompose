@@ -2,8 +2,9 @@ package io.ii.data.di
 
 import android.content.Context
 import androidx.room.Room
-import io.ii.data.local.TaskDatabase
-import io.ii.data.local.dao.TaskDao
+import io.ii.data.local.task.TaskDatabase
+import io.ii.data.local.task.dao.TaskDao
+import io.ii.data.local.token.AccessTokenStorage
 import io.ii.data.remote.api.GigaChatApi
 import io.ii.data.repository.TaskRepositoryImpl
 import io.ii.data.utils.Constants
@@ -27,8 +28,9 @@ val dataModule = module {
 
     single { provideApiClient() }
     single { GigaChatApi(get()) }
+    single { AccessTokenStorage(androidContext()) }
 
-    single<TaskRepository> { provideRepository(get(), get(), get()) }
+    single<TaskRepository> { provideRepository(get(), get(), get(), get()) }
 }
 
 private fun provideDatabase(context: Context): TaskDatabase =
@@ -43,11 +45,13 @@ private fun provideDao(db: TaskDatabase): TaskDao = db.taskDao()
 private fun provideRepository(
     dao: TaskDao,
     db: TaskDatabase,
-    api: GigaChatApi
+    api: GigaChatApi,
+    tokenStorage: AccessTokenStorage
 ): TaskRepository = TaskRepositoryImpl(
     dao = dao,
     db = db,
-    api = api
+    api = api,
+    tokenStorage = tokenStorage
 )
 
 private fun provideApiClient(): HttpClient {

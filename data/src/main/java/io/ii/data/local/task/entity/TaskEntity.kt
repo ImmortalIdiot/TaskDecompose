@@ -1,4 +1,4 @@
-package io.ii.data.local.entity
+package io.ii.data.local.task.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
