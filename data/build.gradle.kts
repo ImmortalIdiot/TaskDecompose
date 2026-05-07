@@ -16,6 +16,8 @@ android {
     defaultConfig {
         minSdk = 29
 
+        buildFeatures.buildConfig = true
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -27,6 +29,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        all {
+            val authToken = "AUTH_TOKEN"
+            val authUrl = "AUTH_URL"
+            val baseUrl = "BASE_URL"
+
+            buildConfigField("String", authToken, "\"MDE5OWM4YjQtMmY1Ni03ZTNiLTk3MDAtMDE3Mzg5MmRiNTkzOjdmNGM4YjYwLTlhMDktNDkwZS1hMzlhLTlkZjMwNjQ5ODE4MQ==\"")
+            buildConfigField("String", authUrl, "\"https://ngw.devices.sberbank.ru:9443/api/v2/oauth\"")
+            buildConfigField("String", baseUrl, "\"https://gigachat.devices.sberbank.ru/\"")
         }
     }
     compileOptions {
