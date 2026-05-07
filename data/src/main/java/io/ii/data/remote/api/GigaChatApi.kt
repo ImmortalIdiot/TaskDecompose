@@ -2,11 +2,15 @@ package io.ii.data.remote.api
 
 import io.ii.data.BuildConfig
 import io.ii.data.remote.dto.GigaChatAccessToken
+import io.ii.data.remote.dto.GigaChatMessage
+import io.ii.data.remote.dto.GigaChatRequest
+import io.ii.data.remote.dto.GigaChatResponse
 import io.ii.data.remote.dto.SubtaskDto
 import io.ii.data.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -15,13 +19,48 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.http.formUrlEncode
+import kotlinx.serialization.json.Json
 import java.util.UUID
 
 internal class GigaChatApi(
     private val client: HttpClient
 ) {
-    suspend fun decomposeTask(prompt: String): List<SubtaskDto> {
-        TODO("Call giga chat api endpoint")
+
+    /**
+     * Отправляет промпт в GigaChat API и возвращает список сгенерированных подзадач.
+     *
+     * Выполняет запрос к эндпоинту chat/completions, получает текстовый ответ модели
+     * и преобразует содержимое ответа в список [SubtaskDto].
+     *
+     * Ожидается, что модель вернёт JSON-массив подзадач в поле message.content.
+     *
+     * @param token токен доступа для авторизации запроса
+     * @param prompt текст запроса для модели
+     * @return список подзадач, полученных от модели
+     */
+    suspend fun decomposeTask(token: String, prompt: String): List<SubtaskDto> {
+
+        val response: GigaChatResponse = client.post(BuildConfig.BASE_URL) {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+
+            bearerAuth(token)
+
+            setBody(
+                GigaChatRequest(
+                    messages = listOf(
+                        GigaChatMessage(
+                            role = Constants.USER_ROLE,
+                            content = prompt
+                        )
+                    )
+                )
+            )
+        }.body()
+
+        return Json.decodeFromString(
+            string = response.choices.first().message.content
+        )
     }
 
     /**

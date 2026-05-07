@@ -9,6 +9,7 @@ import io.ii.data.mapper.toModel
 import io.ii.data.mapper.toModelTree
 import io.ii.data.remote.api.GigaChatApi
 import io.ii.data.remote.dto.GigaChatAccessToken
+import io.ii.data.utils.Constants
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
@@ -28,7 +29,12 @@ internal class TaskRepositoryImpl(
         val newTask = TaskCreator.createTask(title = taskTitle, description = taskDescription)
         val prompt = PromptBuilder.build(task = newTask, params = params)
 
-        return api.decomposeTask(prompt).toModel(newTask)
+        val token = getValidAccessToken()
+
+        return api.decomposeTask(
+            token = token.accessToken,
+            prompt = prompt
+        ).toModel(newTask)
     }
 
     override suspend fun loadDecompositionHistory(): List<Task> {
@@ -57,5 +63,20 @@ internal class TaskRepositoryImpl(
         tokenStorage.saveToken(token)
 
         return token
+    }
+
+    private suspend fun getValidAccessToken(): GigaChatAccessToken {
+        val savedToken = tokenStorage.getToken()
+
+        return if (savedToken != null && savedToken.isValid()) {
+            savedToken
+        } else {
+            authorize()
+        }
+    }
+
+    private fun GigaChatAccessToken.isValid(): Boolean {
+        return accessToken.isNotBlank() &&
+                expiresAt > System.currentTimeMillis() + Constants.TOKEN_EXPIRATION_SAFETY_TIMEOUT_MILLIS
     }
 }
