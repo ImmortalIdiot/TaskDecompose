@@ -1,0 +1,4 @@
+<resources>
+    <string name="task_editor_item_title">Задача</string>
+    <string name="history_item_title">История</string>
+</resources>
