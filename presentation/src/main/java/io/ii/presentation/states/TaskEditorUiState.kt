@@ -1,6 +1,7 @@
 package io.ii.presentation.states
 
 import io.ii.domain.model.DecompositionParams
+import kotlin.String
 
 /**
  * UI state экрана создания и редактирования задачи.
@@ -20,6 +21,7 @@ import io.ii.domain.model.DecompositionParams
  * @property hasPriority учитывать ли приоритетность подзадач
  * @property isLoading выполняется ли запрос декомпозиции
  * @property errorMessage текст ошибки
+ * @property successMessage текст с уведомлением об успешной операции
  */
 internal data class TaskEditorUiState(
     val id: String? = null,
@@ -32,7 +34,8 @@ internal data class TaskEditorUiState(
     val hasPriority: Boolean = false,
 
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val successMessage: String? = null
 ) {
     val isEditMode: Boolean
         get() = id != null
@@ -49,6 +52,26 @@ internal data class TaskEditorUiState(
             hasPriority = hasPriority,
             hasTimeEstimation = false
         )
+
+    /**
+     * Очищает форму задачи, если та находится в режиме создания.
+     *
+     * @return очищенная форма в режиме создания или сама задача в режиме редактирования
+     */
+    fun clear(): TaskEditorUiState {
+        return if (!isEditMode) {
+            copy(
+                title = "",
+                description = "",
+                depth = DEFAULT_DEPTH,
+                hasPriority = false,
+                errorMessage = null,
+                successMessage = null
+            )
+        } else {
+            this
+        }
+    }
 
     companion object {
         private const val DEFAULT_DEPTH = 2

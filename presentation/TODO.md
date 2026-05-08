@@ -2,3 +2,4 @@
 - Implement screen with viewmodels
 - Add text-typing animation for decomposition on TaskEditor screen
 - Replace background color on scaffold in TaskDecompositionNavigation with screens background color
+- Add network check on VMs
