@@ -1,3 +1,5 @@
+package io.ii.taskdecompose
+
 import android.app.Application
 import io.ii.data.di.dataModule
 import org.koin.android.ext.koin.androidContext
