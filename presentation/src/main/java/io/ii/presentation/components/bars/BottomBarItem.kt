@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import io.ii.presentation.components.bars.utils.niceRippleClickable
+import io.ii.presentation.components.utils.niceRippleClickable
 import io.ii.presentation.utils.LocalDimensions
 
 @Composable
