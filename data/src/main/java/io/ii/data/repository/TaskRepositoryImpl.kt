@@ -31,10 +31,14 @@ internal class TaskRepositoryImpl(
 
         val token = getValidAccessToken()
 
-        return api.decomposeTask(
+        val tasks = api.decomposeTask(
             token = token.accessToken,
             prompt = prompt
         ).toModel(newTask)
+
+        dao.upsertAll(tasks.toEntities())
+
+        return tasks
     }
 
     override suspend fun loadDecompositionHistory(): List<Task> {
