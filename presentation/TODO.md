@@ -1,0 +1,3 @@
+- Change animation transitions between screen
+- Implement screen with viewmodels
+- Add text-typing animation for decomposition on TaskEditor screen
