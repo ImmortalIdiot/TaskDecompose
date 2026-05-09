@@ -2,6 +2,7 @@ package io.ii.taskdecompose
 
 import android.app.Application
 import io.ii.data.di.dataModule
+import io.ii.domain.di.domainModule
 import io.ii.presentation.di.presentationModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -20,6 +21,7 @@ class TaskDecompose : Application() {
             androidContext(this@TaskDecompose)
             modules(
                 dataModule,
+                domainModule,
                 presentationModule
             )
         }
