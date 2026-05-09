@@ -9,7 +9,8 @@ internal val LocalDimensions = compositionLocalOf { Dimensions() }
 internal data class Dimensions(
     val padding: Paddings = Paddings(),
     val icon: Icons = Icons(),
-    val corner: Corners = Corners()
+    val corner: Corners = Corners(),
+    val other: Other = Other()
 )
 
 internal data class Paddings(
@@ -17,6 +18,7 @@ internal data class Paddings(
     val paddingM: Dp = 16.dp,
     val paddingL: Dp = 20.dp,
 
+    val padding12: Dp = 12.dp
 )
 
 internal data class Icons(
@@ -25,4 +27,8 @@ internal data class Icons(
 
 internal data class Corners(
     val cornerShapeM: Dp = 20.dp
+)
+
+internal data class Other(
+    val sliderHeight: Dp = 12.dp
 )

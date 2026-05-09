@@ -17,3 +17,16 @@ internal fun Modifier.niceRippleClickable(
         onClick = onClick
     )
 )
+
+internal fun Modifier.noRippleClickable(
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = MutableInteractionSource(),
+    onClick: () -> Unit
+): Modifier = this.then(
+    Modifier.clickable(
+        interactionSource = interactionSource,
+        indication = null,
+        enabled = enabled,
+        onClick = onClick
+    )
+)

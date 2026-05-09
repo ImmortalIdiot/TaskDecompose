@@ -6,4 +6,11 @@
     <string name="save_task_success">Задача обновлена</string>
 
     <string name="delete_task_success">Задача удалена</string>
+
+    <string name="task_title_label">Задача</string>
+    <string name="task_condensed_description">Описание</string>
+    <string name="task_description_label">Контекст задачи</string>
+    <string name="task_decomposition_params">Параметры декомпозиции</string>
+    <string name="task_decomposition_depth">Глубина: %d</string>
+    <string name="task_decomposition_priority">Учитывать приоритет</string>
 </resources>
