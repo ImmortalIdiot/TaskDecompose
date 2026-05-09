@@ -18,6 +18,7 @@ internal data class Paddings(
     val paddingM: Dp = 16.dp,
     val paddingL: Dp = 20.dp,
 
+    val padding4: Dp = 4.dp,
     val padding12: Dp = 12.dp
 )
 
@@ -30,5 +31,9 @@ internal data class Corners(
 )
 
 internal data class Other(
-    val sliderHeight: Dp = 12.dp
+    val sliderHeight: Dp = 12.dp,
+
+    val treeLineStrokeWidth: Dp = 2.dp,
+    val branchRadius: Dp = 8.dp,
+    val centerLineHeight: Dp = 14.dp
 )

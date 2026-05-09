@@ -213,6 +213,22 @@ internal class TaskEditViewModel(
         }
     }
 
+    fun onTitleChange(value: String) {
+        _uiState.update { state -> state.copy(title = value) }
+    }
+
+    fun onDescriptionChange(value: String) {
+        _uiState.update { state -> state.copy(description = value) }
+    }
+
+    fun onDepthChange(value: Int) {
+        _uiState.update { state -> state.copy(depth = value) }
+    }
+
+    fun onPriorityChange(value: Boolean) {
+        _uiState.update { state -> state.copy(hasPriority = value) }
+    }
+
     companion object {
 
         private fun debug(message: String) {

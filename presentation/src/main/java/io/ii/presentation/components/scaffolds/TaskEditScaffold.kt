@@ -27,7 +27,13 @@ internal fun TaskEditScaffold(
         }
     ) { paddingValues ->
         TaskEditScreen(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            uiState = uiState,
+            onTitleChange = viewModel::onTitleChange,
+            onDescriptionChange = viewModel::onDescriptionChange,
+            onDepthChange = viewModel::onDepthChange,
+            onPriorityChange = viewModel::onPriorityChange,
+            onDecomposeClick = viewModel::decomposeTask
         )
     }
 }
