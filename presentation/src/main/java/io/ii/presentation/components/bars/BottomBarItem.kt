@@ -23,6 +23,7 @@ internal fun BottomBarItem(
     selected: Boolean,
     text: String,
     icon: ImageVector,
+    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -42,6 +43,7 @@ internal fun BottomBarItem(
         modifier = modifier
             .clip(barItemShape)
             .niceRippleClickable(
+                enabled = enabled,
                 interactionSource = interactionSource,
                 onClick = onClick
             )
