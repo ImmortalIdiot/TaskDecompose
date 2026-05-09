@@ -9,10 +9,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.ii.presentation.components.bars.TaskEditorTopBar
 import io.ii.presentation.screens.TaskEditScreen
 import io.ii.presentation.viewmodels.TaskEditViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun TaskEditScaffold(
-    viewModel: TaskEditViewModel
+    viewModel: TaskEditViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

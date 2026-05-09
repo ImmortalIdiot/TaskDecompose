@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.koin.android)
+    implementation(libs.koin.compose.viewmodel)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
