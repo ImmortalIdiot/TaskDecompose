@@ -6,6 +6,7 @@ import io.ii.domain.usecase.DeleteTaskUseCase
 import io.ii.domain.usecase.GetTaskUseCase
 import io.ii.domain.usecase.UpdateTaskUseCase
 import io.ii.presentation.R
+import io.ii.presentation.core.NetworkProvider
 import io.ii.presentation.core.ResourceProvider
 import io.ii.presentation.core.launchSafe
 import io.ii.presentation.states.TaskEditorUiState
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
-// TODO: add network check, add getTask by id (navigation from History)
 /**
  * ViewModel экрана создания и редактирования задачи.
  *
@@ -34,6 +34,7 @@ internal class TaskEditViewModel(
     private val getTaskUseCase: GetTaskUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val networkProvider: NetworkProvider,
     private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
@@ -93,6 +94,11 @@ internal class TaskEditViewModel(
      * получает декомпозированную задачу и обновляет состояние экрана.
      */
     fun decomposeTask() {
+        if (!networkProvider.hasInternetConnection()) {
+            setError(R.string.no_internet_connection_error)
+            return
+        }
+
         launchSafe(
             start = {
                 debug("Start decompose.")

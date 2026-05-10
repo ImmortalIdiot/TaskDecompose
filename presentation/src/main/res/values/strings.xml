@@ -7,6 +7,7 @@
     <string name="save_task_success">Задача обновлена</string>
 
     <string name="delete_task_success">Задача удалена</string>
+    <string name="no_internet_connection_error">Нет подключения к интернету</string>
 
     <string name="task_title_label">Задача</string>
     <string name="task_condensed_description">Описание</string>
