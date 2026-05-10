@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.ii.presentation.R
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
-import io.ii.presentation.utils.LocalDimensions
-import io.ii.presentation.utils.PreviewScreen
+import io.ii.presentation.theme.LocalDimensions
+import io.ii.presentation.screens.PreviewScreen
 
 @Composable
 internal fun TaskTitleInput(

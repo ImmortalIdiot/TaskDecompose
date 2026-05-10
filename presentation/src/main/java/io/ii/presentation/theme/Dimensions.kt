@@ -1,4 +1,4 @@
-package io.ii.presentation.utils
+package io.ii.presentation.theme
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp

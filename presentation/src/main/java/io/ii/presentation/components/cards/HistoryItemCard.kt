@@ -37,8 +37,8 @@ import io.ii.presentation.components.utils.niceRippleClickable
 import io.ii.presentation.states.TaskEditorItemUiState
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.Constants
-import io.ii.presentation.utils.LocalDimensions
-import io.ii.presentation.utils.PreviewScreen
+import io.ii.presentation.theme.LocalDimensions
+import io.ii.presentation.screens.PreviewScreen
 
 @Composable
 internal fun HistoryItemCard(

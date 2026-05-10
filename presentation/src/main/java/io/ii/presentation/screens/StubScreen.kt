@@ -1,4 +1,4 @@
-package io.ii.presentation.utils
+package io.ii.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

@@ -1,7 +1,6 @@
-package io.ii.presentation.utils
+package io.ii.presentation.navigation
 
 import androidx.compose.runtime.saveable.Saver
-import io.ii.presentation.navigation.Route
 
 private const val TASK_EDITOR_SCREEN_NAME = "task_editor"
 private const val HISTORY_SCREEN_NAME = "history"

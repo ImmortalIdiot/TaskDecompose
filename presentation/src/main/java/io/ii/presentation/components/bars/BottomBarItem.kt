@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import io.ii.presentation.components.utils.niceRippleClickable
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
-import io.ii.presentation.utils.LocalDimensions
+import io.ii.presentation.theme.LocalDimensions
 
 @Composable
 internal fun BottomBarItem(

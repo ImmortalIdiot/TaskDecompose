@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
 import io.ii.presentation.R
-import io.ii.presentation.utils.StubScreen
 
 // TODO: implement screen
 @Composable
