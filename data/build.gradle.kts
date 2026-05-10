@@ -35,10 +35,12 @@ android {
             val authToken = "AUTH_TOKEN"
             val authUrl = "AUTH_URL"
             val baseUrl = "BASE_URL"
+            val modelsUrl = "MODELS_URL"
 
             buildConfigField("String", authToken, "\"MDE5OWM4YjQtMmY1Ni03ZTNiLTk3MDAtMDE3Mzg5MmRiNTkzOjdmNGM4YjYwLTlhMDktNDkwZS1hMzlhLTlkZjMwNjQ5ODE4MQ==\"")
             buildConfigField("String", authUrl, "\"https://ngw.devices.sberbank.ru:9443/api/v2/oauth\"")
             buildConfigField("String", baseUrl, "\"https://gigachat.devices.sberbank.ru/api/v1/chat/completions\"")
+            buildConfigField("String", modelsUrl, "\"https://gigachat.devices.sberbank.ru/api/v1/models\"")
         }
     }
     compileOptions {

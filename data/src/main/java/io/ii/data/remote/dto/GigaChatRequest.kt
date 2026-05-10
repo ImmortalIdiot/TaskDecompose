@@ -1,6 +1,5 @@
 package io.ii.data.remote.dto
 
-import io.ii.data.utils.Constants
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,5 +13,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class GigaChatRequest(
     val messages: List<GigaChatMessage>,
-    val model: String = Constants.GIGACHAT_MODEL
+    val model: String
 )

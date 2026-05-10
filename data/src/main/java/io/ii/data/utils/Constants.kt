@@ -21,6 +21,6 @@ internal object Constants {
     /**
      * Название модели, которая используется для генерации текста
      */
-    const val GIGACHAT_MODEL = "GigaChat-2"
+    const val GIGACHAT_MODEL = "GigaChat"
     const val USER_ROLE = "user"
 }

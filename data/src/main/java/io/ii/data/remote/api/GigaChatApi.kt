@@ -53,7 +53,8 @@ internal class GigaChatApi(
                             role = Constants.USER_ROLE,
                             content = prompt
                         )
-                    )
+                    ),
+                    model = Constants.GIGACHAT_MODEL
                 )
             )
         }.body()
@@ -84,7 +85,7 @@ internal class GigaChatApi(
 
             header(
                 key = HttpHeaders.Authorization,
-                value = "Basic: ${BuildConfig.AUTH_TOKEN}"
+                value = "Basic ${BuildConfig.AUTH_TOKEN}"
             )
 
             setBody(
