@@ -25,9 +25,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import org.koin.plugin.module.dsl.single
 import java.security.KeyStore
-import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
@@ -43,11 +41,7 @@ val dataModule = module {
     single { AccessTokenStorage(androidContext()) }
 
     single<TaskRepository> {
-        if (BuildConfig.DEBUG) {
-            MockTaskRepository()
-        } else {
-            provideRepository(get(), get(), get(), get())
-        }
+        provideRepository(get(), get(), get(), get())
     }
 }
 

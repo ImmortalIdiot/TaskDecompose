@@ -10,11 +10,13 @@ import io.ii.data.mapper.toModelTree
 import io.ii.data.remote.api.GigaChatApi
 import io.ii.data.remote.dto.GigaChatAccessToken
 import io.ii.data.utils.Constants
+import io.ii.data.utils.LoggingTags
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 internal class TaskRepositoryImpl(
     private val dao: TaskDao,
@@ -28,6 +30,7 @@ internal class TaskRepositoryImpl(
         taskDescription: String?,
         params: DecompositionParams
     ): Task {
+        Timber.tag(LoggingTags.TASK_REPOSITORY).d("Start decompose in repo")
         val newTask = TaskCreator.createTask(title = taskTitle, description = taskDescription)
         val prompt = PromptBuilder.build(task = newTask, params = params)
 
@@ -36,9 +39,15 @@ internal class TaskRepositoryImpl(
         val tasks = api.decomposeTask(
             token = token.accessToken,
             prompt = prompt
-        ).toModel(newTask)
+        )
+            .also { result ->
+                Timber.tag(LoggingTags.TASK_REPOSITORY).d("Task decomposed in repo:\n$result")
+            }
+            .toModel(newTask)
 
         dao.upsertAll(tasks.toEntities())
+
+        Timber.tag(LoggingTags.TASK_REPOSITORY).d("Tasks had been saved to db in repo")
 
         return tasks
     }
@@ -67,6 +76,8 @@ internal class TaskRepositoryImpl(
     private suspend fun authorize(): GigaChatAccessToken {
         val token = api.authorize()
         tokenStorage.saveToken(token)
+
+        Timber.tag(LoggingTags.TASK_REPOSITORY).d("Token saved")
 
         return token
     }

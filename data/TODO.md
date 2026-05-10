@@ -2,4 +2,3 @@
 - Add time estimation support for subtasks (on domain layer too)
 - Add tests
 - Add retry for error requests and network exceptions
-- Add logging (Timber)
