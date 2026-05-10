@@ -79,6 +79,7 @@ internal fun HistoryItemCard(
                         modifier = Modifier.fillMaxWidth(),
                         rootTitle = title,
                         animationSpeedCoefficient = 4f,
+                        enableTypingAnimation = false,
                         subtasks = subtasks
                     )
                 }
