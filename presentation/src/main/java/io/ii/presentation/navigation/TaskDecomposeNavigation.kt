@@ -28,14 +28,20 @@ private fun TaskDecomposeNavigation(
     var backStack by rememberSaveable(
         stateSaver = RouteBackStackSaver
     ) {
-        mutableStateOf(listOf<Route>(Route.TaskEditor))
+        mutableStateOf(listOf<Route>(Route.TaskEditor()))
     }
 
     val selectedRoute = backStack.last()
 
     fun navigateTo(route: Route) {
         backStack = when (route) {
-            Route.TaskEditor -> { listOf(Route.TaskEditor) }
+            is Route.TaskEditor -> {
+                if (route.taskId == null) {
+                    listOf(Route.TaskEditor())
+                } else {
+                    listOf(Route.History, route)
+                }
+            }
 
             Route.History -> {
                 if (selectedRoute == Route.History) {
@@ -63,7 +69,8 @@ private fun TaskDecomposeNavigation(
     ) { paddingValues ->
         TaskDecomposeContent(
             modifier = Modifier.padding(paddingValues),
-            selectedRoute = selectedRoute
+            selectedRoute = selectedRoute,
+            onTaskClick = { taskId -> navigateTo(Route.TaskEditor(taskId)) }
         )
     }
 }

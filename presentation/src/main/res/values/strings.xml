@@ -1,6 +1,7 @@
 <resources>
     <string name="task_editor_item_title">Декомпозиция</string>
     <string name="history_item_title">История</string>
+    <string name="history_empty">История пока пуста</string>
 
     <string name="save_task_error">Задачу нельзя сохранить до декомпозиции</string>
     <string name="save_task_success">Задача обновлена</string>

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun ColumnScope.VerticalSpacer(
+internal fun ColumnScope.VerticalSpacer(
     height: Dp,
     modifier: Modifier = Modifier
 ) {

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import io.ii.presentation.components.spacers.HorizontalSpacer
 import io.ii.presentation.components.spacers.VerticalSpacer
 import io.ii.presentation.components.utils.niceRippleClickable
-import io.ii.presentation.states.TaskEditorItemUiState
+import io.ii.presentation.states.SubtaskState
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.Constants
 import io.ii.presentation.theme.LocalDimensions
@@ -44,7 +44,7 @@ import io.ii.presentation.screens.PreviewScreen
 internal fun HistoryItemCard(
     title: String,
     description: String?,
-    subtasks: List<TaskEditorItemUiState>,
+    subtasks: List<SubtaskState>,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

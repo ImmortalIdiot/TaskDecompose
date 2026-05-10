@@ -41,7 +41,7 @@ import androidx.compose.ui.util.fastRoundToInt
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.components.inputs.OptionalDescriptionInput
 import io.ii.presentation.components.inputs.TaskTitleInput
-import io.ii.presentation.states.TaskEditorItemUiState
+import io.ii.presentation.states.SubtaskState
 import io.ii.presentation.theme.LocalDimensions
 import io.ii.presentation.screens.PreviewScreen
 import kotlinx.coroutines.delay
@@ -64,7 +64,7 @@ private const val TYPEWRITER_CHARACTER_DELAY = 24L
 @Composable
 internal fun TaskTreeCard(
     rootTitle: String,
-    subtasks: List<TaskEditorItemUiState>,
+    subtasks: List<SubtaskState>,
     modifier: Modifier = Modifier,
     enableTypingAnimation: Boolean = true,
     animationSpeedCoefficient: Float = 1f
@@ -94,7 +94,7 @@ internal fun TaskTreeCard(
 }
 
 private data class TaskTreeNodeUi(
-    val item: TaskEditorItemUiState,
+    val item: SubtaskState,
     val parentContinuations: List<Boolean>,
     val isLast: Boolean,
     val indexInTree: Int
@@ -139,7 +139,7 @@ private fun AnimatedTaskTreeItem(
 
 @Composable
 private fun TaskTreeItemRow(
-    item: TaskEditorItemUiState,
+    item: SubtaskState,
     parentContinuations: List<Boolean>,
     isLast: Boolean,
     enableTypingAnimation: Boolean,
@@ -220,11 +220,11 @@ private fun TypewriterText(
     }
 }
 
-private fun List<TaskEditorItemUiState>.flattenTree(): List<TaskTreeNodeUi> {
+private fun List<SubtaskState>.flattenTree(): List<TaskTreeNodeUi> {
     val result = mutableListOf<TaskTreeNodeUi>()
 
     fun addItems(
-        items: List<TaskEditorItemUiState>,
+        items: List<SubtaskState>,
         parentContinuations: List<Boolean>
     ) {
         items.forEachIndexed { index, item ->
@@ -345,25 +345,25 @@ private fun TaskTreeLines(
 private fun TaskTreeCardPreview() {
 
     val mockSubtasks = listOf(
-        TaskEditorItemUiState(
+        SubtaskState(
             id = "1",
             title = "Удалить ненужные программы",
             description = null,
             createdAt = 0L,
             subtasks = listOf(
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "1.1",
                     title = "Открыть список установленных программ",
                     description = null,
                     createdAt = 0L
                 ),
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "1.2",
                     title = "Найти редко используемые приложения",
                     description = null,
                     createdAt = 0L
                 ),
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "1.3",
                     title = "Удалить ненужные программы",
                     description = null,
@@ -371,37 +371,37 @@ private fun TaskTreeCardPreview() {
                 )
             )
         ),
-        TaskEditorItemUiState(
+        SubtaskState(
             id = "2",
             title = "Очистить временные файлы",
             description = null,
             createdAt = 0L,
             subtasks = listOf(
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "2.1",
                     title = "Очистить корзину",
                     description = null,
                     createdAt = 0L
                 ),
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "2.2",
                     title = "Удалить временные файлы системы",
                     description = null,
                     createdAt = 0L
                 ),
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "2.3",
                     title = "Очистить папку Downloads",
                     description = null,
                     createdAt = 0L,
                     subtasks = listOf(
-                        TaskEditorItemUiState(
+                        SubtaskState(
                             id = "2.3.1",
                             title = "Удалить старые архивы",
                             description = null,
                             createdAt = 0L
                         ),
-                        TaskEditorItemUiState(
+                        SubtaskState(
                             id = "2.3.2",
                             title = "Удалить дубликаты файлов",
                             description = null,
@@ -411,19 +411,19 @@ private fun TaskTreeCardPreview() {
                 )
             )
         ),
-        TaskEditorItemUiState(
+        SubtaskState(
             id = "3",
             title = "Проверить автозагрузку",
             description = null,
             createdAt = 0L,
             subtasks = listOf(
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "3.1",
                     title = "Открыть диспетчер задач",
                     description = null,
                     createdAt = 0L
                 ),
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "3.2",
                     title = "Отключить лишние программы из автозагрузки",
                     description = null,
@@ -431,19 +431,19 @@ private fun TaskTreeCardPreview() {
                 )
             )
         ),
-        TaskEditorItemUiState(
+        SubtaskState(
             id = "4",
             title = "Проверить компьютер на вредоносное ПО",
             description = null,
             createdAt = 0L,
             subtasks = listOf(
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "4.1",
                     title = "Обновить антивирусные базы",
                     description = null,
                     createdAt = 0L
                 ),
-                TaskEditorItemUiState(
+                SubtaskState(
                     id = "4.2",
                     title = "Запустить полное сканирование",
                     description = null,

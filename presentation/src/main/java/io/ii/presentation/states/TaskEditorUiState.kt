@@ -28,7 +28,7 @@ internal data class TaskEditorUiState(
     val title: String = "",
     val description: String = "",
     val createdAt: Long? = null,
-    val subtasks: List<TaskEditorItemUiState> = emptyList(),
+    val subtasks: List<SubtaskState> = emptyList(),
 
     val depth: Int = DEFAULT_DEPTH,
     val hasPriority: Boolean = false,

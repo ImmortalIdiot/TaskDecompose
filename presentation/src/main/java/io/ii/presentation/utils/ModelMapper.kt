@@ -1,7 +1,7 @@
 package io.ii.presentation.utils
 
 import io.ii.domain.model.Task
-import io.ii.presentation.states.TaskEditorItemUiState
+import io.ii.presentation.states.SubtaskState
 import io.ii.presentation.states.TaskEditorUiState
 
 /**
@@ -27,8 +27,8 @@ internal fun Task.toEditorUiState(): TaskEditorUiState =
  *
  * @return UI state подзадачи
  */
-internal fun Task.toEditorItemUiState(): TaskEditorItemUiState =
-    TaskEditorItemUiState(
+internal fun Task.toEditorItemUiState(): SubtaskState =
+    SubtaskState(
         id = id,
         title = title,
         description = description,
@@ -67,7 +67,7 @@ internal fun TaskEditorUiState.toDomain(): Task? {
  *
  * @return доменная модель задачи
  */
-internal fun TaskEditorItemUiState.toDomain(): Task =
+internal fun SubtaskState.toDomain(): Task =
     Task(
         id = id,
         title = title,

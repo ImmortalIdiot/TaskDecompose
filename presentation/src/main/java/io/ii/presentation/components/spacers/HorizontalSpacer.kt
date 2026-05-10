@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun RowScope.HorizontalSpacer(
+internal fun RowScope.HorizontalSpacer(
     width: Dp,
     modifier: Modifier = Modifier
 ) {

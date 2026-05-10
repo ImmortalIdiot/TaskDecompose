@@ -1,7 +1,7 @@
 package io.ii.presentation.states
 
 /**
- * UI state элемента подзадачи на экране редактирования.
+ * UI state элемента подзадачи.
  *
  * Используется для отображения и редактирования вложенных подзадач.
  *
@@ -11,10 +11,10 @@ package io.ii.presentation.states
  * @property createdAt время создания задачи в формате timestamp
  * @property subtasks список вложенных подзадач
  */
-internal data class TaskEditorItemUiState(
+internal data class SubtaskState(
     val id: String,
     val title: String,
     val description: String?,
     val createdAt: Long,
-    val subtasks: List<TaskEditorItemUiState> = emptyList()
+    val subtasks: List<SubtaskState> = emptyList()
 )

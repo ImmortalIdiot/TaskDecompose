@@ -15,7 +15,10 @@ internal val RouteBackStackSaver = Saver<List<Route>, List<String>>(
     save = { routes ->
         routes.map { route ->
             when (route) {
-                Route.TaskEditor -> TASK_EDITOR_SCREEN_NAME
+                is Route.TaskEditor -> route.taskId?.let { taskId ->
+                    "$TASK_EDITOR_SCREEN_NAME$:$taskId"
+                } ?: TASK_EDITOR_SCREEN_NAME
+
                 Route.History -> HISTORY_SCREEN_NAME
             }
         }
@@ -23,12 +26,19 @@ internal val RouteBackStackSaver = Saver<List<Route>, List<String>>(
     restore = { screenNames ->
         screenNames.map { screenName ->
             when (screenName) {
-                TASK_EDITOR_SCREEN_NAME -> Route.TaskEditor
                 HISTORY_SCREEN_NAME -> Route.History
-                else -> Route.TaskEditor
+                TASK_EDITOR_SCREEN_NAME -> Route.TaskEditor()
+                else -> {
+                    val taskId = screenName.substringAfter(
+                        delimiter = ":",
+                        missingDelimiterValue = ""
+                    ).takeIf { it.isNotBlank() }
+
+                    Route.TaskEditor(taskId)
+                }
             }
         }.ifEmpty {
-            listOf(Route.TaskEditor)
+            listOf(Route.TaskEditor())
         }
     }
 )

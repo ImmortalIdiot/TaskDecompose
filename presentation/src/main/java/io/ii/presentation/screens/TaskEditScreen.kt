@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,12 +27,17 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun TaskEditScreen(
+    taskId: String? = null,
     viewModel: TaskEditViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isDescriptionExpanded by rememberSaveable { mutableStateOf(false) }
 
     val dimensions = LocalDimensions.current
+
+    LaunchedEffect(taskId) {
+        taskId?.let(viewModel::loadTask)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()

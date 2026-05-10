@@ -3,12 +3,13 @@ package io.ii.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import io.ii.domain.usecase.DecomposeTaskUseCase
 import io.ii.domain.usecase.DeleteTaskUseCase
+import io.ii.domain.usecase.GetTaskUseCase
 import io.ii.domain.usecase.UpdateTaskUseCase
 import io.ii.presentation.R
 import io.ii.presentation.core.ResourceProvider
 import io.ii.presentation.core.launchSafe
-import io.ii.presentation.states.TaskEditorItemUiState
 import io.ii.presentation.states.TaskEditorUiState
+import io.ii.presentation.utils.Constants
 import io.ii.presentation.utils.LoggingTags
 import io.ii.presentation.utils.toDomain
 import io.ii.presentation.utils.toEditorUiState
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
-// TODO: add network check
+// TODO: add network check, add getTask by id (navigation from History)
 /**
  * ViewModel экрана создания и редактирования задачи.
  *
@@ -30,6 +31,7 @@ import timber.log.Timber
  */
 internal class TaskEditViewModel(
     private val decomposeTaskUseCase: DecomposeTaskUseCase,
+    private val getTaskUseCase: GetTaskUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val resourceProvider: ResourceProvider
@@ -38,119 +40,49 @@ internal class TaskEditViewModel(
     private val _uiState = MutableStateFlow(TaskEditorUiState())
     val uiState: StateFlow<TaskEditorUiState> = _uiState.asStateFlow()
 
-    init {
-        _uiState.update { state ->
-            state.copy(
-                subtasks =
-                    listOf(
-                        TaskEditorItemUiState(
-                            id = "1",
-                            title = "Удалить ненужные программы",
-                            description = null,
-                            createdAt = 0L,
-                            subtasks = listOf(
-                                TaskEditorItemUiState(
-                                    id = "1.1",
-                                    title = "Открыть список установленных программ",
-                                    description = null,
-                                    createdAt = 0L
-                                ),
-                                TaskEditorItemUiState(
-                                    id = "1.2",
-                                    title = "Найти редко используемые приложения",
-                                    description = null,
-                                    createdAt = 0L
-                                ),
-                                TaskEditorItemUiState(
-                                    id = "1.3",
-                                    title = "Удалить ненужные программы",
-                                    description = null,
-                                    createdAt = 0L
-                                )
-                            )
-                        ),
-                        TaskEditorItemUiState(
-                            id = "2",
-                            title = "Очистить временные файлы",
-                            description = null,
-                            createdAt = 0L,
-                            subtasks = listOf(
-                                TaskEditorItemUiState(
-                                    id = "2.1",
-                                    title = "Очистить корзину",
-                                    description = null,
-                                    createdAt = 0L
-                                ),
-                                TaskEditorItemUiState(
-                                    id = "2.2",
-                                    title = "Удалить временные файлы системы",
-                                    description = null,
-                                    createdAt = 0L
-                                ),
-                                TaskEditorItemUiState(
-                                    id = "2.3",
-                                    title = "Очистить папку Downloads",
-                                    description = null,
-                                    createdAt = 0L,
-                                    subtasks = listOf(
-                                        TaskEditorItemUiState(
-                                            id = "2.3.1",
-                                            title = "Удалить старые архивы",
-                                            description = null,
-                                            createdAt = 0L
-                                        ),
-                                        TaskEditorItemUiState(
-                                            id = "2.3.2",
-                                            title = "Удалить дубликаты файлов",
-                                            description = null,
-                                            createdAt = 0L
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        TaskEditorItemUiState(
-                            id = "3",
-                            title = "Проверить автозагрузку",
-                            description = null,
-                            createdAt = 0L,
-                            subtasks = listOf(
-                                TaskEditorItemUiState(
-                                    id = "3.1",
-                                    title = "Открыть диспетчер задач",
-                                    description = null,
-                                    createdAt = 0L
-                                ),
-                                TaskEditorItemUiState(
-                                    id = "3.2",
-                                    title = "Отключить лишние программы из автозагрузки",
-                                    description = null,
-                                    createdAt = 0L
-                                )
-                            )
-                        ),
-                        TaskEditorItemUiState(
-                            id = "4",
-                            title = "Проверить компьютер на вредоносное ПО",
-                            description = null,
-                            createdAt = 0L,
-                            subtasks = listOf(
-                                TaskEditorItemUiState(
-                                    id = "4.1",
-                                    title = "Обновить антивирусные базы",
-                                    description = null,
-                                    createdAt = 0L
-                                ),
-                                TaskEditorItemUiState(
-                                    id = "4.2",
-                                    title = "Запустить полное сканирование",
-                                    description = null,
-                                    createdAt = 0L
-                                )
-                            )
-                        )
+    private var loadedTaskId: String? = null
+
+    /**
+     * Загружает задачу для редактирования.
+     *
+     * Используется при переходе из истории на экран редактирования.
+     *
+     * @param taskId идентификатор задачи
+     */
+    fun loadTask(taskId: String) {
+        if (loadedTaskId == taskId) {
+            return
+        }
+
+        launchSafe(
+            start = {
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = true,
+                        errorMessage = null,
+                        successMessage = null
                     )
-            )
+                }
+            },
+            onError = { error ->
+                error(error.message ?: "Unknown")
+                setError(error.localizedMessage.orEmpty())
+            },
+            final = {
+                _uiState.update { state ->
+                    state.copy(isLoading = false)
+                }
+            }
+        ) {
+            val task = getTaskUseCase(taskId)
+
+            if (task == null) {
+                setError("Task not found")
+                return@launchSafe
+            }
+
+            loadedTaskId = taskId
+            _uiState.value = task.toEditorUiState()
         }
     }
 

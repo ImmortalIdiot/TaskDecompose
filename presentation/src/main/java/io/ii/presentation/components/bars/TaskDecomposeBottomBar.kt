@@ -30,9 +30,9 @@ internal fun TaskDecomposeBottomBar(
     ) {
         BottomBarItem(
             modifier = Modifier.weight(1f),
-            selected = selectedRoute == Route.TaskEditor,
-            enabled = selectedRoute != Route.TaskEditor,
-            onClick = { onRouteClick(Route.TaskEditor) },
+            selected = selectedRoute is Route.TaskEditor,
+            enabled = selectedRoute !is Route.TaskEditor,
+            onClick = { onRouteClick(Route.TaskEditor()) },
             icon = Icons.Outlined.AutoAwesome,
             text = stringResource(R.string.task_editor_item_title)
         )
@@ -52,7 +52,7 @@ internal fun TaskDecomposeBottomBar(
 @Composable
 private fun TaskDecomposeBottomBarPreview() {
 
-    var route by remember { mutableStateOf<Route>(Route.TaskEditor) }
+    var route by remember { mutableStateOf<Route>(Route.TaskEditor()) }
 
     PreviewScreen(
         alignment = Alignment.BottomStart,

@@ -16,6 +16,7 @@ import io.ii.presentation.utils.Constants
 @Composable
 internal fun TaskDecomposeContent(
     selectedRoute: Route,
+    onTaskClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -42,12 +43,12 @@ internal fun TaskDecomposeContent(
         }
     ) { route ->
         when (route) {
-            Route.TaskEditor -> {
-                TaskEditScreen()
+            is Route.TaskEditor -> {
+                TaskEditScreen(taskId = route.taskId)
             }
 
             Route.History -> {
-                HistoryScreen()
+                HistoryScreen(onTaskClick = onTaskClick)
             }
         }
     }
