@@ -2,7 +2,7 @@ package io.ii.presentation.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
 import io.ii.presentation.R
 import io.ii.presentation.utils.StubScreen
@@ -15,6 +15,6 @@ internal fun HistoryScreen(
     StubScreen(
         modifier = modifier,
         text = stringResource(R.string.history_item_title),
-        backgroundColor = Color(0xFFFFC857)
+        backgroundColor = MaterialTheme.colorScheme.surfaceContainer
     )
 }

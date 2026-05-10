@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.components.inputs.OptionalDescriptionInput
 import io.ii.presentation.components.inputs.TaskTitleInput
 import io.ii.presentation.states.TaskEditorItemUiState
@@ -53,7 +54,10 @@ internal fun TaskTreeCard(
     val dimensions = LocalDimensions.current
     val nodes = remember(subtasks) { subtasks.flattenTree() }
 
-    Card(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        colors = TaskDecomposeComponentDefaults.cardColors()
+    ) {
         Column(
             modifier = Modifier.padding(dimensions.padding.paddingM)
         ) {

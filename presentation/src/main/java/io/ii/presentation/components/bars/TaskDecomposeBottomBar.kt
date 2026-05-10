@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.ii.presentation.R
 import io.ii.presentation.navigation.Route
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.PreviewScreen
 
 @Composable
@@ -24,7 +25,8 @@ internal fun TaskDecomposeBottomBar(
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
-        modifier = modifier
+        modifier = modifier,
+        containerColor = TaskDecomposeComponentDefaults.navigationBarContainerColor()
     ) {
         BottomBarItem(
             modifier = Modifier.weight(1f),

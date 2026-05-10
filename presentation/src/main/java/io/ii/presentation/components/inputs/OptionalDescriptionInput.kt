@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.ii.presentation.R
 import io.ii.presentation.components.utils.noRippleClickable
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.LocalDimensions
 import io.ii.presentation.utils.PreviewScreen
 
@@ -40,7 +41,10 @@ internal fun OptionalDescriptionInput(
 ) {
     val dimensions = LocalDimensions.current
 
-    Card(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        colors = TaskDecomposeComponentDefaults.cardColors()
+    ) {
         Column(
             modifier = Modifier
                 .padding(dimensions.padding.paddingM)
@@ -79,7 +83,8 @@ internal fun OptionalDescriptionInput(
                         )
                     },
                     minLines = 3,
-                    maxLines = 7
+                    maxLines = 7,
+                    colors = TaskDecomposeComponentDefaults.textFieldColors()
                 )
             }
         }

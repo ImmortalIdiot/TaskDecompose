@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.ii.presentation.R
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.LocalDimensions
 import io.ii.presentation.utils.PreviewScreen
 
@@ -34,6 +35,7 @@ internal fun TaskEditorTopBar(
     TopAppBar(
         modifier = modifier,
         windowInsets = WindowInsets(dimensions.padding.zero),
+        colors = TaskDecomposeComponentDefaults.topAppBarColors(),
         title = {
             Text(stringResource(R.string.task_editor_item_title))
         },

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.ii.presentation.R
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.LocalDimensions
 import io.ii.presentation.utils.PreviewScreen
 import kotlin.math.roundToInt
@@ -42,7 +43,10 @@ internal fun DecompositionParamsCard(
         (maxDepth - minDepth).toInt() - 1
     }
 
-    Card(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        colors = TaskDecomposeComponentDefaults.cardColors()
+    ) {
         Column(
             modifier = Modifier.padding(dimensions.padding.paddingM),
             verticalArrangement = Arrangement.spacedBy(dimensions.padding.padding12)
@@ -63,6 +67,7 @@ internal fun DecompositionParamsCard(
                 onValueChange = { onDepthChange(it.roundToInt()) },
                 valueRange = minDepth..maxDepth,
                 steps = steps,
+                colors = TaskDecomposeComponentDefaults.sliderColors()
             )
 
             Row(
@@ -76,7 +81,8 @@ internal fun DecompositionParamsCard(
 
                 Switch(
                     checked = hasPriority,
-                    onCheckedChange = onPriorityChange
+                    onCheckedChange = onPriorityChange,
+                    colors = TaskDecomposeComponentDefaults.switchColors()
                 )
             }
         }

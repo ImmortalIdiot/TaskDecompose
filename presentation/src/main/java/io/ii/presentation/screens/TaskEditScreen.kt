@@ -19,6 +19,7 @@ import io.ii.presentation.components.cards.DecompositionParamsCard
 import io.ii.presentation.components.cards.TaskTreeCard
 import io.ii.presentation.components.inputs.OptionalDescriptionInput
 import io.ii.presentation.components.inputs.TaskTitleInput
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.LocalDimensions
 import io.ii.presentation.viewmodels.TaskEditViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -83,7 +84,11 @@ internal fun TaskEditScreen(
 
             if (uiState.isLoading) {
                 item {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = TaskDecomposeComponentDefaults.progressColor(),
+                        trackColor = TaskDecomposeComponentDefaults.progressTrackColor()
+                    )
                 }
             }
 

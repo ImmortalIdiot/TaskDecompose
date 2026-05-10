@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import io.ii.presentation.components.utils.niceRippleClickable
+import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.utils.LocalDimensions
 
 @Composable
@@ -28,9 +28,9 @@ internal fun BottomBarItem(
     modifier: Modifier = Modifier
 ) {
     val contentColor = if (selected) {
-        MaterialTheme.colorScheme.primary
+        TaskDecomposeComponentDefaults.selectedNavigationContentColor()
     } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
+        TaskDecomposeComponentDefaults.unselectedNavigationContentColor()
     }
 
     val dimensions = LocalDimensions.current
