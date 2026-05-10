@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastRoundToInt
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.components.inputs.OptionalDescriptionInput
 import io.ii.presentation.components.inputs.TaskTitleInput
@@ -43,12 +44,13 @@ import io.ii.presentation.utils.PreviewScreen
 import kotlinx.coroutines.delay
 
 private const val ANIMATION_DELAY = 160L
-private const val ANIMATION_SPEED = 200
+private const val ANIMATION_DURATION = 200
 
 @Composable
 internal fun TaskTreeCard(
     rootTitle: String,
     subtasks: List<TaskEditorItemUiState>,
+    animationSpeedCoefficient: Float = 1f,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
@@ -59,12 +61,15 @@ internal fun TaskTreeCard(
         colors = TaskDecomposeComponentDefaults.cardColors()
     ) {
         Column(
-            modifier = Modifier.padding(dimensions.padding.paddingM)
+            modifier = Modifier.padding(vertical = dimensions.padding.paddingM)
         ) {
             TaskTreeRootItem(title = rootTitle)
 
             nodes.forEach { node ->
-                AnimatedTaskTreeItem(node = node)
+                AnimatedTaskTreeItem(
+                    node = node,
+                    animationSpeedCoefficient = animationSpeedCoefficient.coerceIn(0f, 10f).fastRoundToInt()
+                )
             }
         }
     }
@@ -80,24 +85,25 @@ private data class TaskTreeNodeUi(
 @Composable
 private fun AnimatedTaskTreeItem(
     node: TaskTreeNodeUi,
+    animationSpeedCoefficient: Int,
     modifier: Modifier = Modifier
 ) {
     var visible by remember(node.item.id) { mutableStateOf(false) }
 
     LaunchedEffect(node.item.id) {
-        delay(node.indexInTree * ANIMATION_DELAY)
+        delay(node.indexInTree * ANIMATION_DELAY / animationSpeedCoefficient)
         visible = true
     }
 
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(
-            animationSpec = tween(durationMillis = ANIMATION_SPEED)
+            animationSpec = tween(durationMillis = ANIMATION_DURATION / animationSpeedCoefficient)
         ) + expandVertically(
-            animationSpec = tween(durationMillis = ANIMATION_SPEED),
+            animationSpec = tween(durationMillis = ANIMATION_DURATION / animationSpeedCoefficient),
             expandFrom = Alignment.Top
         ) + slideInVertically(
-            animationSpec = tween(durationMillis = ANIMATION_SPEED),
+            animationSpec = tween(durationMillis = ANIMATION_DURATION / animationSpeedCoefficient),
             initialOffsetY = { -it / 3 }
         ),
         modifier = modifier
