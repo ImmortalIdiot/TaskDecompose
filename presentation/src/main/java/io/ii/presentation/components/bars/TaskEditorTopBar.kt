@@ -3,6 +3,8 @@ package io.ii.presentation.components.bars
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,8 +26,12 @@ import io.ii.presentation.screens.PreviewScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TaskEditorTopBar(
+    showBackButton: Boolean,
+    showCreateButton: Boolean,
     isSaveEnabled: Boolean,
     isDeleteEnabled: Boolean,
+    onBackClick: () -> Unit,
+    onCreateClick: () -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -36,10 +42,33 @@ internal fun TaskEditorTopBar(
         modifier = modifier,
         windowInsets = WindowInsets(dimensions.padding.zero),
         colors = TaskDecomposeComponentDefaults.topAppBarColors(),
+        navigationIcon = {
+            if (showBackButton) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        modifier = Modifier.size(dimensions.icon.iconM),
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        },
         title = {
             Text(stringResource(R.string.task_editor_item_title))
         },
         actions = {
+            if (showCreateButton) {
+                IconButton(onClick = onCreateClick) {
+                    Icon(
+                        modifier = Modifier.size(dimensions.icon.iconM),
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
             IconButton(
                 onClick = onDeleteClick,
                 enabled = isDeleteEnabled
@@ -73,8 +102,12 @@ private fun TaskEditorTopBarPreview() {
     PreviewScreen(
         content = {
             TaskEditorTopBar(
+                showBackButton = true,
+                showCreateButton = true,
                 isSaveEnabled = true,
                 isDeleteEnabled = true,
+                onBackClick = {},
+                onCreateClick = {},
                 onSaveClick = {},
                 onDeleteClick = {}
             )

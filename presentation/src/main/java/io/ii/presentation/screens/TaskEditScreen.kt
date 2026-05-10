@@ -28,6 +28,9 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 internal fun TaskEditScreen(
     taskId: String? = null,
+    canNavigateBack: Boolean = false,
+    onBackClick: () -> Unit = {},
+    onCreateClick: () -> Unit = {},
     viewModel: TaskEditViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -36,15 +39,26 @@ internal fun TaskEditScreen(
     val dimensions = LocalDimensions.current
 
     LaunchedEffect(taskId) {
-        taskId?.let(viewModel::loadTask)
+        if (taskId == null) {
+            viewModel.createNewTask()
+        } else {
+            viewModel.loadTask(taskId)
+        }
     }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TaskEditorTopBar(
+            showBackButton = canNavigateBack && uiState.id != null,
+            showCreateButton = uiState.id != null,
             isSaveEnabled = uiState.title.isNotBlank() && !uiState.isLoading,
             isDeleteEnabled = !uiState.isLoading,
+            onBackClick = onBackClick,
+            onCreateClick = {
+                viewModel.createNewTask()
+                onCreateClick()
+            },
             onSaveClick = viewModel::saveTask,
             onDeleteClick = viewModel::deleteTask
         )

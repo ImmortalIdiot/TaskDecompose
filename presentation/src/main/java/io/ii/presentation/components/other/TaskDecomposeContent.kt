@@ -17,6 +17,8 @@ import io.ii.presentation.utils.Constants
 internal fun TaskDecomposeContent(
     selectedRoute: Route,
     onTaskClick: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onCreateTaskClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -44,7 +46,12 @@ internal fun TaskDecomposeContent(
     ) { route ->
         when (route) {
             is Route.TaskEditor -> {
-                TaskEditScreen(taskId = route.taskId)
+                TaskEditScreen(
+                    taskId = route.taskId,
+                    canNavigateBack = route.taskId != null,
+                    onBackClick = onBackClick,
+                    onCreateClick = onCreateTaskClick
+                )
             }
 
             Route.History -> {

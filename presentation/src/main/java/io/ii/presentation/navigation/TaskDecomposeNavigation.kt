@@ -57,6 +57,12 @@ private fun TaskDecomposeNavigation(
         backStack = backStack.dropLast(1)
     }
 
+    fun navigateBack() {
+        if (backStack.size > 1) {
+            backStack = backStack.dropLast(1)
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
@@ -70,7 +76,9 @@ private fun TaskDecomposeNavigation(
         TaskDecomposeContent(
             modifier = Modifier.padding(paddingValues),
             selectedRoute = selectedRoute,
-            onTaskClick = { taskId -> navigateTo(Route.TaskEditor(taskId)) }
+            onTaskClick = { taskId -> navigateTo(Route.TaskEditor(taskId)) },
+            onBackClick = ::navigateBack,
+            onCreateTaskClick = { navigateTo(Route.TaskEditor()) }
         )
     }
 }

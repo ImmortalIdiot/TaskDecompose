@@ -44,6 +44,14 @@ internal class TaskEditViewModel(
     private var loadedTaskId: String? = null
 
     /**
+     * Переводит редактор в режим создания новой задачи.
+     */
+    fun createNewTask() {
+        loadedTaskId = null
+        _uiState.value = TaskEditorUiState()
+    }
+
+    /**
      * Загружает задачу для редактирования.
      *
      * Используется при переходе из истории на экран редактирования.
