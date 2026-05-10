@@ -2,6 +2,7 @@ package io.ii.domain.usecase
 
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Юзкейс для загрузки истории декомпозиции задач.
@@ -12,7 +13,7 @@ import io.ii.domain.repository.TaskRepository
  */
 class LoadDecompositionHistoryUseCase(
     private val repository: TaskRepository
-) : UseCase<Unit, List<Task>>() {
+) {
 
-    override suspend fun execute(params: Unit): List<Task> = repository.loadDecompositionHistory()
+    operator fun invoke(): Flow<List<Task>> = repository.loadDecompositionHistory()
 }

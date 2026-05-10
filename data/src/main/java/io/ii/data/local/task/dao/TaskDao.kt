@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import io.ii.data.local.task.entity.TaskEntity
+import kotlinx.coroutines.flow.Flow
 
 /**
  * DAO-интерфейс для работы с задачами в базе данных.
@@ -20,7 +21,7 @@ internal interface TaskDao {
      * @return список задач
      */
     @Query("SELECT * FROM tasks")
-    suspend fun getAllTasks(): List<TaskEntity>
+    fun getAllTasks(): Flow<List<TaskEntity>>
 
     /**
      * Возвращает задачу по её идентификатору со всеми подзадачами.

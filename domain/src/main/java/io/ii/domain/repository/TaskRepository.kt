@@ -2,6 +2,7 @@ package io.ii.domain.repository
 
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Репозиторий задач.
@@ -35,7 +36,7 @@ interface TaskRepository {
      *
      * @return список ранее сохранённых задач
      */
-    suspend fun loadDecompositionHistory(): List<Task>
+    fun loadDecompositionHistory(): Flow<List<Task>>
 
     /**
      * Получает задачу по её идентификатору.

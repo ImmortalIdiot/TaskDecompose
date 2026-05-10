@@ -13,6 +13,8 @@ import io.ii.data.utils.Constants
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 internal class TaskRepositoryImpl(
     private val dao: TaskDao,
@@ -41,8 +43,8 @@ internal class TaskRepositoryImpl(
         return tasks
     }
 
-    override suspend fun loadDecompositionHistory(): List<Task> {
-        return dao.getAllTasks().toModelTree()
+    override fun loadDecompositionHistory(): Flow<List<Task>> {
+        return dao.getAllTasks().map { tasks -> tasks.toModelTree() }
     }
 
     override suspend fun getTaskById(id: String): Task? {

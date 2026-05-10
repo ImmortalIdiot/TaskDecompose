@@ -3,6 +3,9 @@ package io.ii.data.repository
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.UUID
@@ -15,6 +18,7 @@ internal class MockTaskRepository : TaskRepository {
 
     private val mutex = Mutex()
     private var tasks = createInitialTasks()
+    private val historyFlow = MutableStateFlow(tasks)
 
     override suspend fun decomposeTask(
         taskTitle: String,
@@ -31,11 +35,12 @@ internal class MockTaskRepository : TaskRepository {
         )
 
         tasks = listOf(task) + tasks
+        historyFlow.value = tasks
 
         task
     }
 
-    override suspend fun loadDecompositionHistory(): List<Task> = mutex.withLock { tasks }
+    override fun loadDecompositionHistory(): Flow<List<Task>> = historyFlow.asStateFlow()
 
     override suspend fun getTaskById(id: String): Task? = mutex.withLock {
         tasks.firstNotNullOfOrNull { task -> task.findById(id) }
@@ -59,6 +64,8 @@ internal class MockTaskRepository : TaskRepository {
             if (!updated) {
                 tasks = listOf(task) + tasks
             }
+
+            historyFlow.value = tasks
         }
     }
 
@@ -67,6 +74,8 @@ internal class MockTaskRepository : TaskRepository {
             tasks = tasks
                 .filterNot { task -> task.id == id }
                 .map { task -> task.removeChild(id) }
+
+            historyFlow.value = tasks
         }
     }
 

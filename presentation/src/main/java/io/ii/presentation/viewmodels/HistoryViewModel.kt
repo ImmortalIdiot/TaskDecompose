@@ -9,6 +9,7 @@ import io.ii.presentation.utils.toEditorItemUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import java.time.Instant
 import java.time.ZoneId
@@ -37,29 +38,35 @@ internal class HistoryViewModel(
             },
             onError = { error ->
                 _uiState.update { state ->
-                    state.copy(errorMessage = error.localizedMessage.orEmpty())
-                }
-            },
-            final = {
-                _uiState.update { state ->
-                    state.copy(isLoading = false)
+                    state.copy(
+                        isLoading = false,
+                        errorMessage = error.localizedMessage.orEmpty()
+                    )
                 }
             }
         ) {
-            val groups = loadDecompositionHistoryUseCase(Unit)
-                .sortedByDescending { task -> task.createdAt }
-                .groupBy { task -> task.createdAt.toLocalDate() }
-                .toSortedMap(compareByDescending { it })
-                .map { (date, tasks) ->
-                    HistoryDateGroupUiState(
-                        date = date.format(DATE_FORMATTER),
-                        tasks = tasks.map { task -> task.toEditorItemUiState() }
-                    )
+            loadDecompositionHistoryUseCase()
+                .map { tasks ->
+                    tasks
+                        .sortedByDescending { task -> task.createdAt }
+                        .groupBy { task -> task.createdAt.toLocalDate() }
+                        .toSortedMap(compareByDescending { it })
+                        .map { (date, tasks) ->
+                            HistoryDateGroupUiState(
+                                date = date.format(DATE_FORMATTER),
+                                tasks = tasks.map { task -> task.toEditorItemUiState() }
+                            )
+                        }
                 }
-
-            _uiState.update { state ->
-                state.copy(groups = groups)
-            }
+                .collect { groups ->
+                    _uiState.update { state ->
+                        state.copy(
+                            groups = groups,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                }
         }
     }
 
