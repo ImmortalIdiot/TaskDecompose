@@ -1,6 +1,7 @@
 package io.ii.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,74 +13,88 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.ii.presentation.components.bars.TaskEditorTopBar
 import io.ii.presentation.components.cards.DecompositionParamsCard
 import io.ii.presentation.components.cards.TaskTreeCard
 import io.ii.presentation.components.inputs.OptionalDescriptionInput
 import io.ii.presentation.components.inputs.TaskTitleInput
-import io.ii.presentation.states.TaskEditorUiState
 import io.ii.presentation.utils.LocalDimensions
+import io.ii.presentation.viewmodels.TaskEditViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun TaskEditScreen(
-    uiState: TaskEditorUiState,
-    onTitleChange: (String) -> Unit,
-    onDescriptionChange: (String) -> Unit,
-    onDepthChange: (Int) -> Unit,
-    onPriorityChange: (Boolean) -> Unit,
-    onDecomposeClick: () -> Unit,
-    modifier: Modifier = Modifier
+    viewModel: TaskEditViewModel = koinViewModel()
 ) {
-    val dimensions = LocalDimensions.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isDescriptionExpanded by rememberSaveable { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(dimensions.padding.paddingM),
-        verticalArrangement = Arrangement.spacedBy(dimensions.padding.paddingM)
+    val dimensions = LocalDimensions.current
+
+    Column(
+        modifier = Modifier.fillMaxSize()
     ) {
-        item {
-            TaskTitleInput(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.title,
-                isLoading = uiState.isLoading,
-                onValueChange = onTitleChange,
-                onDecomposeClick = onDecomposeClick
-            )
-        }
+        TaskEditorTopBar(
+            isSaveEnabled = uiState.title.isNotBlank() && !uiState.isLoading,
+            isDeleteEnabled = !uiState.isLoading,
+            onSaveClick = viewModel::saveTask,
+            onDeleteClick = viewModel::deleteTask
+        )
 
-        item {
-            OptionalDescriptionInput(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.description,
-                expanded = isDescriptionExpanded,
-                onExpandedChange = { isDescriptionExpanded = it },
-                onValueChange = onDescriptionChange
-            )
-        }
-
-        item {
-            DecompositionParamsCard(
-                modifier = Modifier.fillMaxWidth(),
-                depth = uiState.depth,
-                hasPriority = uiState.hasPriority,
-                onDepthChange = onDepthChange,
-                onPriorityChange = onPriorityChange
-            )
-        }
-
-        if (uiState.isLoading) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = dimensions.padding.paddingM,
+                end = dimensions.padding.paddingM,
+                bottom = dimensions.padding.paddingM
+            ),
+            verticalArrangement = Arrangement.spacedBy(dimensions.padding.paddingM)
+        ) {
             item {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-        }
-
-        if (uiState.subtasks.isNotEmpty()) {
-            item {
-                TaskTreeCard(
+                TaskTitleInput(
                     modifier = Modifier.fillMaxWidth(),
-                    rootTitle = uiState.title,
-                    subtasks = uiState.subtasks
+                    value = uiState.title,
+                    isLoading = uiState.isLoading,
+                    onValueChange = viewModel::onTitleChange,
+                    onDecomposeClick = viewModel::decomposeTask
                 )
+            }
+
+            item {
+                OptionalDescriptionInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = uiState.description,
+                    expanded = isDescriptionExpanded,
+                    onExpandedChange = { isDescriptionExpanded = it },
+                    onValueChange = viewModel::onDescriptionChange
+                )
+            }
+
+            item {
+                DecompositionParamsCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    depth = uiState.depth,
+                    hasPriority = uiState.hasPriority,
+                    onDepthChange = viewModel::onDepthChange,
+                    onPriorityChange = viewModel::onPriorityChange
+                )
+            }
+
+            if (uiState.isLoading) {
+                item {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+            }
+
+            if (uiState.subtasks.isNotEmpty()) {
+                item {
+                    TaskTreeCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        rootTitle = uiState.title,
+                        subtasks = uiState.subtasks
+                    )
+                }
             }
         }
     }

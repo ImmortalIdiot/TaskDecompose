@@ -70,6 +70,7 @@ internal fun DecompositionParamsCard(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
                     text = stringResource(R.string.task_decomposition_priority)
                 )
 

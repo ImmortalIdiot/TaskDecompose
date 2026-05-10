@@ -8,9 +8,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import io.ii.presentation.components.scaffolds.TaskEditScaffold
 import io.ii.presentation.navigation.Route
 import io.ii.presentation.screens.HistoryScreen
+import io.ii.presentation.screens.TaskEditScreen
 import io.ii.presentation.utils.Constants
 
 @Composable
@@ -43,7 +43,7 @@ internal fun TaskDecomposeContent(
     ) { route ->
         when (route) {
             Route.TaskEditor -> {
-                TaskEditScaffold()
+                TaskEditScreen()
             }
 
             Route.History -> {

@@ -19,10 +19,13 @@ internal data class Paddings(
     val paddingL: Dp = 20.dp,
 
     val padding4: Dp = 4.dp,
-    val padding12: Dp = 12.dp
+    val padding12: Dp = 12.dp,
+
+    val zero: Dp = 0.dp
 )
 
 internal data class Icons(
+    val iconM: Dp = 24.dp,
     val iconL: Dp = 32.dp
 )
 
