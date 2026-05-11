@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,19 +74,44 @@ internal fun TaskTreeCard(
     val nodes = remember(subtasks) { subtasks.flattenTree() }
     val animationSpeed = animationSpeedCoefficient.coerceIn(1f, 10f).fastRoundToInt()
 
+    val animationKey = remember(subtasks) { subtasks.animationKey() }
+    var hasAnimationPlayed by rememberSaveable(animationKey) {
+        mutableStateOf(!enableTypingAnimation)
+    }
+
+    val shouldAnimate = enableTypingAnimation && !hasAnimationPlayed
+
+    LaunchedEffect(animationKey, shouldAnimate) {
+        if (shouldAnimate) {
+            val lastNodeAnimationDelay = nodes.lastOrNull()?.indexInTree
+                ?.let { index -> index * ANIMATION_DELAY / animationSpeed }
+                ?: 0L
+            val maxTypingDelay = nodes.maxOfOrNull { node ->
+                node.item.title.length * TYPEWRITER_CHARACTER_DELAY / animationSpeed
+            } ?: 0L
+
+            delay(lastNodeAnimationDelay + maxOf(ANIMATION_DURATION.toLong(), maxTypingDelay))
+            hasAnimationPlayed = true
+        }
+    }
+
     Card(
         modifier = modifier,
         colors = TaskDecomposeComponentDefaults.cardColors()
     ) {
         Column(
-            modifier = Modifier.padding(vertical = dimensions.padding.paddingM)
+            modifier = Modifier.padding(
+                top = dimensions.padding.paddingM,
+                bottom = dimensions.padding.paddingM,
+                start = dimensions.padding.paddingS
+            )
         ) {
             TaskTreeRootItem(title = rootTitle)
 
             nodes.forEach { node ->
                 AnimatedTaskTreeItem(
                     node = node,
-                    enableTypingAnimation = enableTypingAnimation,
+                    shouldAnimate = shouldAnimate,
                     animationSpeedCoefficient = animationSpeed
                 )
             }
@@ -103,15 +129,17 @@ private data class TaskTreeNodeUi(
 @Composable
 private fun AnimatedTaskTreeItem(
     node: TaskTreeNodeUi,
-    enableTypingAnimation: Boolean,
+    shouldAnimate: Boolean,
     animationSpeedCoefficient: Int,
     modifier: Modifier = Modifier
 ) {
-    var visible by remember(node.item.id) { mutableStateOf(false) }
+    var visible by remember(node.item.id, shouldAnimate) { mutableStateOf(!shouldAnimate) }
 
-    LaunchedEffect(node.item.id) {
-        delay(node.indexInTree * ANIMATION_DELAY / animationSpeedCoefficient)
-        visible = true
+    LaunchedEffect(node.item.id, shouldAnimate) {
+        if (shouldAnimate) {
+            delay(node.indexInTree * ANIMATION_DELAY / animationSpeedCoefficient)
+            visible = true
+        }
     }
 
     AnimatedVisibility(
@@ -131,7 +159,7 @@ private fun AnimatedTaskTreeItem(
             item = node.item,
             parentContinuations = node.parentContinuations,
             isLast = node.isLast,
-            enableTypingAnimation = enableTypingAnimation,
+            enableTypingAnimation = shouldAnimate,
             animationSpeedCoefficient = animationSpeedCoefficient
         )
     }
@@ -251,6 +279,21 @@ private fun List<SubtaskState>.flattenTree(): List<TaskTreeNodeUi> {
 
     return result
 }
+
+private fun List<SubtaskState>.animationKey(): String =
+    buildString {
+        fun appendItems(items: List<SubtaskState>) {
+            items.forEach { item ->
+                append(item.id)
+                append(':')
+                append(item.title)
+                append('|')
+                appendItems(item.subtasks)
+            }
+        }
+
+        appendItems(this@animationKey)
+    }
 
 @Composable
 private fun TaskTreeRootItem(
