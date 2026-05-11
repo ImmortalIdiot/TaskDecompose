@@ -55,10 +55,6 @@ internal class TaskRepositoryImpl(
 
         val tasks = result.tasks.toModel(newTask)
 
-        dao.upsertAll(tasks.toEntities())
-
-        Timber.tag(LoggingTags.TASK_REPOSITORY).d("Tasks had been saved to db in repo")
-
         return tasks
     }
 

@@ -61,11 +61,11 @@ class TaskEditViewModelTest {
     }
 
     /**
-     * Проверяет, что декомпозиция передаёт в use case актуальные параметры
-     * и заменяет состояние редактора полученной задачей.
+     * Проверяет, что декомпозиция передаёт в use case актуальные параметры,
+     * применяет полученную задачу, сохраняет её и не сбрасывает выбранные параметры формы.
      */
     @Test
-    fun `decomposeTask sends trimmed business params and replaces state with result`() = runTest {
+    fun `decomposeTask sends trimmed business params and keeps form params after result`() = runTest {
         repository.decomposedTask = Task(
             id = "TaskId",
             title = "Task",
@@ -95,7 +95,43 @@ class TaskEditViewModelTest {
         assertEquals(true, repository.decomposeCall?.params?.hasPriority)
         assertEquals("TaskId", viewModel.uiState.value.id)
         assertEquals("SubtaskId", viewModel.uiState.value.subtasks.single().id)
+        assertEquals(4, viewModel.uiState.value.depth)
+        assertEquals(true, viewModel.uiState.value.hasPriority)
+        assertEquals("TaskId", repository.updatedTask?.id)
+        assertEquals("SubtaskId", repository.updatedTask?.subtasks?.single()?.id)
         assertFalse(viewModel.uiState.value.isLoading)
+    }
+
+    /**
+     * Проверяет, что повторная декомпозиция уже полученной задачи сохраняет существующий корневой идентификатор.
+     */
+    @Test
+    fun `decomposeTask saves regenerated result with current root id`() = runTest {
+        val viewModel = viewModel()
+
+        viewModel.onTitleChange("Task")
+        repository.decomposedTask = Task(
+            id = "FirstId",
+            title = "Task",
+            description = null,
+            createdAt = 1L
+        )
+        viewModel.decomposeTask()
+        waitUntil { viewModel.uiState.value.id == "FirstId" }
+
+        repository.decomposedTask = Task(
+            id = "SecondId",
+            title = "Task",
+            description = null,
+            createdAt = 2L
+        )
+        viewModel.decomposeTask()
+        waitUntil { viewModel.uiState.value.createdAt == 1L && !viewModel.uiState.value.isLoading }
+
+        assertEquals("FirstId", viewModel.uiState.value.id)
+        assertEquals(1L, viewModel.uiState.value.createdAt)
+        assertEquals("FirstId", repository.updatedTask?.id)
+        assertEquals(1L, repository.updatedTask?.createdAt)
     }
 
     /**

@@ -23,7 +23,7 @@ interface TaskRepository {
      * @param taskTitle текст исходной задачи, введенный пользователем
      * @param taskDescription возможное описание задачи, введенное пользователем
      * @param params параметры декомпозиции
-     * @return задача с заполненным списком подзадач
+     * @return задача с заполненным списком подзадач без сохранения в истории
      */
     suspend fun decomposeTask(
         taskTitle: String,

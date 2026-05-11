@@ -34,9 +34,6 @@ internal class MockTaskRepository : TaskRepository {
             )
         )
 
-        tasks = listOf(task) + tasks
-        historyFlow.value = tasks
-
         task
     }
 

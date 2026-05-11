@@ -72,7 +72,7 @@ internal fun TaskEditScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(dimensions.padding.paddingM)
         ) {
-            item {
+            item(key = "title") {
                 TaskTitleInput(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.title,
@@ -82,7 +82,7 @@ internal fun TaskEditScreen(
                 )
             }
 
-            item {
+            item(key = "description") {
                 OptionalDescriptionInput(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.description,
@@ -92,7 +92,7 @@ internal fun TaskEditScreen(
                 )
             }
 
-            item {
+            item(key = "params") {
                 DecompositionParamsCard(
                     modifier = Modifier.fillMaxWidth(),
                     depth = uiState.depth,
@@ -103,7 +103,7 @@ internal fun TaskEditScreen(
             }
 
             if (uiState.isLoading) {
-                item {
+                item(key = "progress") {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
                         color = TaskDecomposeComponentDefaults.progressColor(),
@@ -112,8 +112,8 @@ internal fun TaskEditScreen(
                 }
             }
 
-            if (uiState.subtasks.isNotEmpty()) {
-                item {
+            if (!uiState.isLoading && uiState.subtasks.isNotEmpty()) {
+                item(key = "task_tree") {
                     TaskTreeCard(
                         modifier = Modifier.fillMaxWidth(),
                         rootTitle = uiState.title,

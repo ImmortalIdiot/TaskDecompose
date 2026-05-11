@@ -142,7 +142,22 @@ internal class TaskEditViewModel(
 
             debug("End decomposition")
 
-            _uiState.value = decomposedTask
+            val updatedTaskState = decomposedTask.copy(
+                id = state.id ?: decomposedTask.id,
+                createdAt = state.createdAt ?: decomposedTask.createdAt,
+                depth = state.depth,
+                hasPriority = state.hasPriority
+            )
+
+            _uiState.value = updatedTaskState
+
+            val task = updatedTaskState.toDomain()
+            if (task == null) {
+                setError(R.string.save_task_error)
+                return@launchSafe
+            }
+
+            updateTaskUseCase(task)
         }
     }
 
