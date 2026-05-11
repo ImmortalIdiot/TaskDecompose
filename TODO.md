@@ -1,6 +1,3 @@
-- Add gigachat tokens lost, cold application starts, time of decompositions metrics
-- Change animation transitions between screen
-- Add tests
 - Add subtasks validation on api-level (subtask list is not empty)
 - Add time estimation support for subtasks (on domain layer too)
 - Add retry for error requests and network exceptions

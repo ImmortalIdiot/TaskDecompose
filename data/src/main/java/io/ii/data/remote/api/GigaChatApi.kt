@@ -1,12 +1,13 @@
 package io.ii.data.remote.api
 
 import io.ii.data.BuildConfig
+import io.ii.data.remote.dto.DecompositionApiResult
 import io.ii.data.remote.dto.GigaChatAccessToken
 import io.ii.data.remote.dto.GigaChatMessage
 import io.ii.data.remote.dto.GigaChatRequest
 import io.ii.data.remote.dto.GigaChatResponse
-import io.ii.data.remote.dto.TaskDto
 import io.ii.data.utils.Constants
+import android.os.SystemClock
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
@@ -38,7 +39,8 @@ internal class GigaChatApi(
      * @param prompt текст запроса для модели
      * @return список подзадач, полученных от модели
      */
-    suspend fun decomposeTask(token: String, prompt: String): List<TaskDto> {
+    suspend fun decomposeTask(token: String, prompt: String): DecompositionApiResult {
+        val requestStartedAt = SystemClock.elapsedRealtime()
 
         val response: GigaChatResponse = client.post(BuildConfig.BASE_URL) {
             contentType(ContentType.Application.Json)
@@ -58,9 +60,14 @@ internal class GigaChatApi(
                 )
             )
         }.body()
+        val requestResponseDurationMillis = SystemClock.elapsedRealtime() - requestStartedAt
 
-        return Json.decodeFromString(
-            string = response.choices.first().message.content
+        return DecompositionApiResult(
+            tasks = Json.decodeFromString(
+                string = response.choices.first().message.content
+            ),
+            usage = response.usage,
+            requestResponseDurationMillis = requestResponseDurationMillis
         )
     }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "172823179854",
+    "project_id": "taskdecomposition",
+    "storage_bucket": "taskdecomposition.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172823179854:android:4235d6b9c6425e8bf8491f",
+        "android_client_info": {
+          "package_name": "io.ii.taskdecompose"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi8qrk70ncIF74cUKi_OUFDqFhBGjFTas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

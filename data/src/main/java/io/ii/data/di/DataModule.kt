@@ -6,6 +6,8 @@ import io.ii.data.R
 import io.ii.data.local.task.TaskDatabase
 import io.ii.data.local.task.dao.TaskDao
 import io.ii.data.local.token.AccessTokenStorage
+import io.ii.data.metrics.FirebaseMetricsReporter
+import io.ii.data.metrics.MetricsReporter
 import io.ii.data.remote.api.GigaChatApi
 import io.ii.data.repository.TaskRepositoryImpl
 import io.ii.data.utils.Constants
@@ -37,9 +39,10 @@ val dataModule = module {
     single { provideApiClient(get()) }
     single { GigaChatApi(get()) }
     single { AccessTokenStorage(androidContext()) }
+    single<MetricsReporter> { FirebaseMetricsReporter(androidContext()) }
 
     single<TaskRepository> {
-        provideRepository(get(), get(), get(), get())
+        provideRepository(get(), get(), get(), get(), get())
     }
 }
 
@@ -66,6 +69,7 @@ private fun provideDao(db: TaskDatabase): TaskDao = db.taskDao()
  * @param db БД с задачами для создания собственных транзакций
  * @param api API клиента GigaChat
  * @param tokenStorage хранилище токена доступа для GigaChat API
+ * @param metricsReporter отправитель метрик приложения
  *
  * @return реализация [TaskRepository]
  */
@@ -73,12 +77,14 @@ private fun provideRepository(
     dao: TaskDao,
     db: TaskDatabase,
     api: GigaChatApi,
-    tokenStorage: AccessTokenStorage
+    tokenStorage: AccessTokenStorage,
+    metricsReporter: MetricsReporter
 ): TaskRepository = TaskRepositoryImpl(
     dao = dao,
     db = db,
     api = api,
-    tokenStorage = tokenStorage
+    tokenStorage = tokenStorage,
+    metricsReporter = metricsReporter
 )
 
 /**

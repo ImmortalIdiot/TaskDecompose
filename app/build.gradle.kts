@@ -7,6 +7,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 val keystoreProperties = Properties().apply {
     val file = rootProject.file("keystore.properties")
     if (file.exists()) {
@@ -99,4 +103,7 @@ dependencies {
     implementation(libs.koin.android)
 
     implementation(libs.timber)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }

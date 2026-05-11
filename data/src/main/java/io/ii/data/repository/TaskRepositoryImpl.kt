@@ -7,6 +7,7 @@ import io.ii.data.local.token.AccessTokenStorage
 import io.ii.data.mapper.toEntities
 import io.ii.data.mapper.toModel
 import io.ii.data.mapper.toModelTree
+import io.ii.data.metrics.MetricsReporter
 import io.ii.data.remote.api.GigaChatApi
 import io.ii.data.remote.dto.GigaChatAccessToken
 import io.ii.data.utils.Constants
@@ -22,7 +23,8 @@ internal class TaskRepositoryImpl(
     private val dao: TaskDao,
     private val db: TaskDatabase,
     private val api: GigaChatApi,
-    private val tokenStorage: AccessTokenStorage
+    private val tokenStorage: AccessTokenStorage,
+    private val metricsReporter: MetricsReporter
 ) : TaskRepository {
 
     override suspend fun decomposeTask(
@@ -36,14 +38,22 @@ internal class TaskRepositoryImpl(
 
         val token = getValidAccessToken()
 
-        val tasks = api.decomposeTask(
+        val result = api.decomposeTask(
             token = token.accessToken,
             prompt = prompt
         )
             .also { result ->
-                Timber.tag(LoggingTags.TASK_REPOSITORY).d("Task decomposed in repo:\n$result")
+                Timber.tag(LoggingTags.TASK_REPOSITORY).d("Task decomposed in repo:\n${result.tasks}")
             }
-            .toModel(newTask)
+
+        metricsReporter.reportTaskDecomposition(
+            requestResponseDurationMillis = result.requestResponseDurationMillis,
+            promptTokens = result.usage?.promptTokens,
+            completionTokens = result.usage?.completionTokens,
+            totalTokens = result.usage?.totalTokens
+        )
+
+        val tasks = result.tasks.toModel(newTask)
 
         dao.upsertAll(tasks.toEntities())
 

@@ -24,6 +24,8 @@ kotlinxSerializationCore = "1.10.0"
 material3 = "1.4.0"
 iconsExtended = "1.7.8"
 timber = "5.0.1"
+firebaseBom = "34.7.0"
+googleServices = "4.4.4"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -69,6 +71,9 @@ androidx-compose-material3-icons = { module = "androidx.compose.material:materia
 
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber"}
 
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -77,3 +82,4 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 android-library = { id = "com.android.library", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
