@@ -112,7 +112,11 @@ internal fun TaskEditorTopBar(
                     modifier = Modifier.size(dimensions.icon.iconM),
                     imageVector = Icons.Rounded.Save,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = if (isSaveEnabled) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
                 )
             }
 
