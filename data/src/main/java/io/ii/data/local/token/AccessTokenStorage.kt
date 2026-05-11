@@ -42,13 +42,6 @@ internal class AccessTokenStorage(
         }
     }
 
-    suspend fun clearToken() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(ACCESS_TOKEN_KEY)
-            preferences.remove(EXPIRES_AT_KEY)
-        }
-    }
-
     companion object {
         private const val PREFERENCES_NAME = "gigachat_token"
 

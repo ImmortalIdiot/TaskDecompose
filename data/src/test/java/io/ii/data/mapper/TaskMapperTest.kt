@@ -1,7 +1,7 @@
 package io.ii.data.mapper
 
 import io.ii.data.local.task.entity.TaskEntity
-import io.ii.data.remote.dto.SubtaskDto
+import io.ii.data.remote.dto.TaskDto
 import io.ii.domain.model.Task
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -130,9 +130,9 @@ class TaskMapperTest {
             createdAt = 1L
         )
         val dto = listOf(
-            SubtaskDto(
+            TaskDto(
                 title = "Child",
-                subtasks = listOf(SubtaskDto(title = "Grandchild"))
+                subtasks = listOf(TaskDto(title = "Grandchild"))
             )
         )
 

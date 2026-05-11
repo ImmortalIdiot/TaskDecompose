@@ -1,7 +1,7 @@
 package io.ii.data.mapper
 
 import io.ii.data.local.task.entity.TaskEntity
-import io.ii.data.remote.dto.SubtaskDto
+import io.ii.data.remote.dto.TaskDto
 import io.ii.data.repository.TaskCreator
 import io.ii.domain.model.Task
 
@@ -118,6 +118,6 @@ private fun TaskEntity.toModel(
  * @param originalTask исходная задача
  * @return задача с заполненным списком подзадач
  */
-internal fun List<SubtaskDto>.toModel(originalTask: Task): Task {
+internal fun List<TaskDto>.toModel(originalTask: Task): Task {
     return originalTask.copy(subtasks = map(TaskCreator::createSubtask))
 }

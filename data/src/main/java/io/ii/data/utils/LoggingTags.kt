@@ -1,7 +1,7 @@
 package io.ii.data.utils
 
 /**
- * Теги логирования
+ * Теги логирования модуля `data`.
  */
 internal object LoggingTags {
 

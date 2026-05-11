@@ -1,6 +1,6 @@
 package io.ii.data.repository
 
-import io.ii.data.remote.dto.SubtaskDto
+import io.ii.data.remote.dto.TaskDto
 import io.ii.domain.model.Task
 import java.util.UUID
 
@@ -35,7 +35,7 @@ internal object TaskCreator {
      * @param dto DTO подзадачи, полученной от API
      * @return доменная модель подзадачи
      */
-    fun createSubtask(dto: SubtaskDto): Task {
+    fun createSubtask(dto: TaskDto): Task {
         return Task(
             id = createTaskId(),
             title = dto.title,

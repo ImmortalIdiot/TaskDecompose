@@ -1,6 +1,6 @@
 package io.ii.data.repository
 
-import io.ii.data.remote.dto.SubtaskDto
+import io.ii.data.remote.dto.TaskDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
@@ -42,9 +42,9 @@ class TaskCreatorTest {
     @Test
     fun `createSubtask recursively maps dto and generates unique ids`() {
         val task = TaskCreator.createSubtask(
-            SubtaskDto(
+            TaskDto(
                 title = "Child",
-                subtasks = listOf(SubtaskDto(title = "Grandchild"))
+                subtasks = listOf(TaskDto(title = "Grandchild"))
             )
         )
 

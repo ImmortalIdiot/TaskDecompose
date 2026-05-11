@@ -5,7 +5,7 @@ import io.ii.data.remote.dto.GigaChatAccessToken
 import io.ii.data.remote.dto.GigaChatMessage
 import io.ii.data.remote.dto.GigaChatRequest
 import io.ii.data.remote.dto.GigaChatResponse
-import io.ii.data.remote.dto.SubtaskDto
+import io.ii.data.remote.dto.TaskDto
 import io.ii.data.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -30,7 +30,7 @@ internal class GigaChatApi(
      * Отправляет промпт в GigaChat API и возвращает список сгенерированных подзадач.
      *
      * Выполняет запрос к эндпоинту chat/completions, получает текстовый ответ модели
-     * и преобразует содержимое ответа в список [SubtaskDto].
+     * и преобразует содержимое ответа в список [TaskDto].
      *
      * Ожидается, что модель вернёт JSON-массив подзадач в поле message.content.
      *
@@ -38,7 +38,7 @@ internal class GigaChatApi(
      * @param prompt текст запроса для модели
      * @return список подзадач, полученных от модели
      */
-    suspend fun decomposeTask(token: String, prompt: String): List<SubtaskDto> {
+    suspend fun decomposeTask(token: String, prompt: String): List<TaskDto> {
 
         val response: GigaChatResponse = client.post(BuildConfig.BASE_URL) {
             contentType(ContentType.Application.Json)

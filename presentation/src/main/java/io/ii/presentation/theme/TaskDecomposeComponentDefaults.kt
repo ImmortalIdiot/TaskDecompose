@@ -3,8 +3,6 @@ package io.ii.presentation.theme
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SliderColors
@@ -59,17 +57,6 @@ internal object TaskDecomposeComponentDefaults {
 
     @Composable
     fun unselectedNavigationContentColor(): Color = MaterialTheme.colorScheme.onSurfaceVariant
-
-    @Composable
-    fun navigationBarItemColors(): NavigationBarItemColors = NavigationBarItemDefaults.colors(
-        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        selectedTextColor = MaterialTheme.colorScheme.primary,
-        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledIconColor = MaterialTheme.colorScheme.outline,
-        disabledTextColor = MaterialTheme.colorScheme.outline
-    )
 
     @Composable
     fun sliderColors(): SliderColors = SliderDefaults.colors(

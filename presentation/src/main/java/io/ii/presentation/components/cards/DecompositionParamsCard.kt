@@ -25,6 +25,7 @@ import io.ii.presentation.R
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.theme.LocalDimensions
 import io.ii.presentation.screens.PreviewScreen
+import io.ii.presentation.utils.Constants
 import kotlin.math.roundToInt
 
 @Composable
@@ -33,8 +34,8 @@ internal fun DecompositionParamsCard(
     hasPriority: Boolean,
     onDepthChange: (Int) -> Unit,
     onPriorityChange: (Boolean) -> Unit,
-    minDepth: Float = 2f,
-    maxDepth: Float = 5f,
+    minDepth: Float = Constants.MIN_DECOMPOSITION_DEPTH,
+    maxDepth: Float = Constants.MAX_DECOMPOSITION_DEPTH,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
@@ -61,7 +62,6 @@ internal fun DecompositionParamsCard(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            // TODO: modify slider
             Slider(
                 value = depth.toFloat(),
                 onValueChange = { onDepthChange(it.roundToInt()) },

@@ -2,10 +2,16 @@ package io.ii.presentation.utils
 
 import io.ii.presentation.states.SubtaskState
 
+/**
+ * Хранит общие константы, которые используются в модуле `presentation`.
+ */
 internal object Constants {
 
     const val SLIDE_ANIMATION_DURATION: Int = 350 // in millis
     const val FADE_ANIMATION_DURATION: Int = 250 // in millis
+
+    const val MIN_DECOMPOSITION_DEPTH = 1f
+    const val MAX_DECOMPOSITION_DEPTH = 5f
 
     val MOCK_SUBTASKS = listOf(
         SubtaskState(

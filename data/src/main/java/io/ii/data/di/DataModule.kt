@@ -2,13 +2,11 @@ package io.ii.data.di
 
 import android.content.Context
 import androidx.room.Room
-import io.ii.data.BuildConfig
 import io.ii.data.R
 import io.ii.data.local.task.TaskDatabase
 import io.ii.data.local.task.dao.TaskDao
 import io.ii.data.local.token.AccessTokenStorage
 import io.ii.data.remote.api.GigaChatApi
-import io.ii.data.repository.MockTaskRepository
 import io.ii.data.repository.TaskRepositoryImpl
 import io.ii.data.utils.Constants
 import io.ii.domain.repository.TaskRepository
@@ -45,6 +43,13 @@ val dataModule = module {
     }
 }
 
+/**
+ * Создает Room БД для хранения дерева декомпозированных задач.
+ *
+ * @param context Android context, используемый для инициализации Room
+ *
+ * @return экземпляр [TaskDatabase]
+ */
 private fun provideDatabase(context: Context): TaskDatabase =
     Room.databaseBuilder(
         context = context,
@@ -54,6 +59,16 @@ private fun provideDatabase(context: Context): TaskDatabase =
 
 private fun provideDao(db: TaskDatabase): TaskDao = db.taskDao()
 
+/**
+ * Создает реализацию репозитория задач.
+ *
+ * @param dao DAO для доступа к локальным задачам
+ * @param db БД с задачами для создания собственных транзакций
+ * @param api API клиента GigaChat
+ * @param tokenStorage хранилище токена доступа для GigaChat API
+ *
+ * @return реализация [TaskRepository]
+ */
 private fun provideRepository(
     dao: TaskDao,
     db: TaskDatabase,
@@ -66,6 +81,15 @@ private fun provideRepository(
     tokenStorage = tokenStorage
 )
 
+/**
+ * Создает Ktor HTTP client поверх настроенного [OkHttpClient].
+ *
+ * Подключает JSON сериализацию, таймауты и базовые заголовки для запросов к API.
+ *
+ * @param okHttpClient OkHttp client с настроенным SSL контекстом
+ *
+ * @return экземпляр [HttpClient]
+ */
 private fun provideApiClient(
     okHttpClient: OkHttpClient
 ): HttpClient {
@@ -101,6 +125,13 @@ private fun provideApiClient(
 private const val CERTIFICATE_FACTORY_INSTANCE = "X.509"
 private const val SSL_PROTOCOL = "TLS"
 
+/**
+ * Создает OkHttp client с доверенными сертификатами Минцифры, поставляемыми в ресурсах приложения.
+ *
+ * @param context Android context для чтения raw ресурсов сертификатов
+ *
+ * @return экземпляр [OkHttpClient]
+ */
 private fun provideOkHttpClient(
     context: Context
 ) : OkHttpClient {

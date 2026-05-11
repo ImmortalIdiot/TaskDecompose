@@ -15,6 +15,13 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+/**
+ * ViewModel экрана истории декомпозированных задач.
+ *
+ * Отвечает за:
+ * - загрузку истории задач;
+ * - группировку истории по дате;
+ */
 internal class HistoryViewModel(
     private val loadDecompositionHistoryUseCase: LoadDecompositionHistoryUseCase
 ) : ViewModel() {
@@ -26,6 +33,9 @@ internal class HistoryViewModel(
         loadHistory()
     }
 
+    /**
+     * Загружает историю декомпозиций и группирует задачи по дате создания.
+     */
     fun loadHistory() {
         launchSafe(
             start = {
@@ -70,6 +80,9 @@ internal class HistoryViewModel(
         }
     }
 
+    /**
+     * Преобразует timestamp в локальную дату устройства.
+     */
     private fun Long.toLocalDate() =
         Instant.ofEpochMilli(this)
             .atZone(ZoneId.systemDefault())
