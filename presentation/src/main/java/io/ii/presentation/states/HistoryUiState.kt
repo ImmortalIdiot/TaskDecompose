@@ -9,9 +9,22 @@ package io.ii.presentation.states
  */
 internal data class HistoryUiState(
     val groups: List<HistoryDateGroupUiState> = emptyList(),
+    val selectedTaskIds: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null
-)
+) {
+    val taskIds: Set<String>
+        get() = groups.flatMap { group -> group.tasks.map { task -> task.id } }.toSet()
+
+    val hasTasks: Boolean
+        get() = taskIds.isNotEmpty()
+
+    val hasSelection: Boolean
+        get() = selectedTaskIds.isNotEmpty()
+
+    val isAllSelected: Boolean
+        get() = hasTasks && selectedTaskIds.containsAll(taskIds)
+}
 
 /**
  * Группа задач истории за один день.

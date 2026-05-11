@@ -1,6 +1,7 @@
 package io.ii.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
+import io.ii.domain.usecase.DeleteTaskUseCase
 import io.ii.domain.usecase.LoadDecompositionHistoryUseCase
 import io.ii.presentation.core.launchSafe
 import io.ii.presentation.states.HistoryDateGroupUiState
@@ -11,9 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * ViewModel экрана истории декомпозированных задач.
@@ -23,7 +26,9 @@ import java.time.format.DateTimeFormatter
  * - группировку истории по дате;
  */
 internal class HistoryViewModel(
-    private val loadDecompositionHistoryUseCase: LoadDecompositionHistoryUseCase
+    private val loadDecompositionHistoryUseCase: LoadDecompositionHistoryUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val clock: Clock = Clock.systemDefaultZone()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState(isLoading = true))
@@ -63,15 +68,18 @@ internal class HistoryViewModel(
                         .toSortedMap(compareByDescending { it })
                         .map { (date, tasks) ->
                             HistoryDateGroupUiState(
-                                date = date.format(DATE_FORMATTER),
+                                date = date.formatForHistory(),
                                 tasks = tasks.map { task -> task.toEditorItemUiState() }
                             )
                         }
                 }
                 .collect { groups ->
+                    val taskIds = groups.flatMap { group -> group.tasks.map { task -> task.id } }.toSet()
+
                     _uiState.update { state ->
                         state.copy(
                             groups = groups,
+                            selectedTaskIds = state.selectedTaskIds.intersect(taskIds),
                             isLoading = false,
                             errorMessage = null
                         )
@@ -81,14 +89,70 @@ internal class HistoryViewModel(
     }
 
     /**
+     * Выбирает карточку истории или снимает выбор.
+     */
+    fun toggleTaskSelection(taskId: String) {
+        _uiState.update { state ->
+            val selectedTaskIds = if (taskId in state.selectedTaskIds) {
+                state.selectedTaskIds - taskId
+            } else {
+                state.selectedTaskIds + taskId
+            }
+
+            state.copy(selectedTaskIds = selectedTaskIds)
+        }
+    }
+
+    /**
+     * Очищает выбранные элементы истории или всю историю, если выбор пустой.
+     */
+    fun deleteSelectedOrAllHistory() {
+        launchSafe(
+            onError = { error ->
+                _uiState.update { state ->
+                    state.copy(errorMessage = error.localizedMessage.orEmpty())
+                }
+            }
+        ) {
+            val state = _uiState.value
+            val deletingIds = if (state.hasSelection) {
+                state.selectedTaskIds
+            } else {
+                state.taskIds
+            }
+
+            deletingIds.forEach { taskId ->
+                deleteTaskUseCase(taskId)
+            }
+
+            _uiState.update { currentState ->
+                currentState.copy(selectedTaskIds = emptySet())
+            }
+        }
+    }
+
+    /**
      * Преобразует timestamp в локальную дату устройства.
      */
     private fun Long.toLocalDate() =
         Instant.ofEpochMilli(this)
-            .atZone(ZoneId.systemDefault())
+            .atZone(clock.zone)
             .toLocalDate()
 
+    private fun LocalDate.formatForHistory(): String {
+        val today = LocalDate.now(clock)
+
+        return when (this) {
+            today -> "Сегодня"
+            today.minusDays(1) -> "Вчера"
+            else -> format(DATE_FORMATTER)
+        }
+    }
+
     private companion object {
-        val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(
+            "d MMMM yyyy",
+            Locale.forLanguageTag("ru")
+        )
     }
 }

@@ -27,6 +27,8 @@ class FakeTaskRepository : TaskRepository {
 
     var deletedTaskId: String? = null
         private set
+    var deletedTaskIds: List<String> = emptyList()
+        private set
 
     var tasksById: Map<String, Task> = emptyMap()
     private val history = MutableStateFlow<List<Task>>(emptyList())
@@ -50,6 +52,7 @@ class FakeTaskRepository : TaskRepository {
 
     override suspend fun deleteTask(id: String) {
         deletedTaskId = id
+        deletedTaskIds = deletedTaskIds + id
     }
 
     /**

@@ -15,5 +15,5 @@ val presentationModule = module {
     single<ResourceProvider> { ResourceProviderImpl(androidContext()) }
 
     viewModel { TaskEditViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { HistoryViewModel(get()) }
+    viewModel { HistoryViewModel(get(), get()) }
 }

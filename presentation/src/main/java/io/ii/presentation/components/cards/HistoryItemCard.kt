@@ -6,6 +6,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,20 +49,40 @@ internal fun HistoryItemCard(
     title: String,
     description: String?,
     subtasks: List<SubtaskState>,
+    isSelected: Boolean,
     onItemClick: () -> Unit,
+    onItemLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val cardShape = MaterialTheme.shapes.medium
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .niceRippleClickable(onClick = onItemClick),
-        colors = TaskDecomposeComponentDefaults.cardColors()
+        modifier = modifier.fillMaxWidth(),
+        shape = cardShape,
+        colors = if (isSelected) {
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        } else {
+            TaskDecomposeComponentDefaults.cardColors()
+        },
+        border = if (isSelected) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            null
+        }
     ) {
         Column(
-            modifier = Modifier.padding(dimensions.padding.paddingM)
+            modifier = Modifier
+                .fillMaxWidth()
+                .historyCardClickable(
+                    onClick = onItemClick,
+                    onLongClick = onItemLongClick
+                )
+                .padding(dimensions.padding.paddingM)
         ) {
             HistoryItemHeader(
                 title = title,
@@ -87,6 +111,15 @@ internal fun HistoryItemCard(
         }
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun Modifier.historyCardClickable(
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+): Modifier = combinedClickable(
+    onClick = onClick,
+    onLongClick = onLongClick
+)
 
 @Composable
 private fun HistoryItemHeader(
@@ -161,14 +194,18 @@ private fun HistoryItemCardPreview() {
                 HistoryItemCard(
                     title = taskText,
                     description = null,
+                    isSelected = false,
                     onItemClick = {},
+                    onItemLongClick = {},
                     subtasks = Constants.MOCK_SUBTASKS
                 )
 
                 HistoryItemCard(
                     title = taskText,
                     description = LoremIpsum(100).values.first(),
+                    isSelected = true,
                     onItemClick = {},
+                    onItemLongClick = {},
                     subtasks = Constants.MOCK_SUBTASKS
                 )
             }

@@ -1,7 +1,11 @@
 package io.ii.presentation.components.bars
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -15,7 +19,10 @@ import io.ii.presentation.theme.LocalDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun HistoryTopBar() {
+internal fun HistoryTopBar(
+    showDeleteButton: Boolean = false,
+    onDeleteClick: () -> Unit = {}
+) {
     val dimensions = LocalDimensions.current
 
     TopAppBar(
@@ -23,6 +30,16 @@ internal fun HistoryTopBar() {
         colors = TaskDecomposeComponentDefaults.topAppBarColors(),
         title = {
             Text(stringResource(R.string.history_item_title))
+        },
+        actions = {
+            if (showDeleteButton) {
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.history_clear_action)
+                    )
+                }
+            }
         }
     )
 }

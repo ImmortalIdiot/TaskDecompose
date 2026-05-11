@@ -7,11 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,11 +36,28 @@ internal fun HistoryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dimensions = LocalDimensions.current
+    var showClearHistoryDialog by rememberSaveable { mutableStateOf(false) }
+
+    if (showClearHistoryDialog) {
+        ClearHistoryDialog(
+            clearAllHistory = uiState.isAllSelected || !uiState.hasSelection,
+            onConfirm = {
+                showClearHistoryDialog = false
+                viewModel.deleteSelectedOrAllHistory()
+            },
+            onDismiss = {
+                showClearHistoryDialog = false
+            }
+        )
+    }
 
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        HistoryTopBar()
+        HistoryTopBar(
+            showDeleteButton = uiState.hasTasks,
+            onDeleteClick = { showClearHistoryDialog = true }
+        )
 
         if (uiState.isLoading) {
             LinearProgressIndicator(
@@ -87,7 +109,17 @@ internal fun HistoryScreen(
                                 title = task.title,
                                 description = task.description,
                                 subtasks = task.subtasks,
-                                onItemClick = { onTaskClick(task.id) }
+                                isSelected = task.id in uiState.selectedTaskIds,
+                                onItemClick = {
+                                    if (uiState.hasSelection) {
+                                        viewModel.toggleTaskSelection(task.id)
+                                    } else {
+                                        onTaskClick(task.id)
+                                    }
+                                },
+                                onItemLongClick = {
+                                    viewModel.toggleTaskSelection(task.id)
+                                }
                             )
                         }
                     }
@@ -95,4 +127,39 @@ internal fun HistoryScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ClearHistoryDialog(
+    clearAllHistory: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = stringResource(R.string.history_clear_dialog_title))
+        },
+        text = {
+            Text(
+                text = stringResource(
+                    if (clearAllHistory) {
+                        R.string.history_clear_all_dialog_text
+                    } else {
+                        R.string.history_clear_selected_dialog_text
+                    }
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(R.string.history_clear_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.history_clear_cancel))
+            }
+        }
+    )
 }

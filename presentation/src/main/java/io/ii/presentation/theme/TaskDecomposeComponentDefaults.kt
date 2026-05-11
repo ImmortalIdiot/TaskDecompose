@@ -36,7 +36,7 @@ internal object TaskDecomposeComponentDefaults {
         disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
         focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
-        unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        unfocusedTrailingIconColor = MaterialTheme.colorScheme.primary,
         disabledTrailingIconColor = MaterialTheme.colorScheme.outline
     )
 
