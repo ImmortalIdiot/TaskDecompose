@@ -8,10 +8,8 @@ package io.ii.domain.model
  *
  * @property depth глубина декомпозиции (уровень вложенности)
  * @property hasPriority учитывать ли приоритизацию подзадач
- * @property hasTimeEstimation добавлять ли оценку времени для подзадач
  */
 data class DecompositionParams(
     val depth: Int,
-    val hasPriority: Boolean,
-    val hasTimeEstimation: Boolean
+    val hasPriority: Boolean
 )

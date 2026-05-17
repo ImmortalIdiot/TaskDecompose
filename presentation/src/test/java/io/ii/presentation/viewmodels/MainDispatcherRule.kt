@@ -6,30 +6,31 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
+import org.junit.jupiter.api.extension.AfterEachCallback
+import org.junit.jupiter.api.extension.BeforeEachCallback
+import org.junit.jupiter.api.extension.ExtensionContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 /**
- * JUnit-правило для подмены Main-диспетчера в тестах ViewModel.
+ * JUnit-расширение для подмены Main-диспетчера в тестах ViewModel.
  *
  * Позволяет запускать корутины из viewModelScope в JVM unit-тестах без Android main looper.
  */
 class MainDispatcherRule(
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher()
-) : TestWatcher() {
+) : BeforeEachCallback, AfterEachCallback {
 
     /**
      * Устанавливает тестовый диспетчер перед запуском каждого теста.
      */
-    override fun starting(description: Description) {
+    override fun beforeEach(context: ExtensionContext) {
         Dispatchers.setMain(dispatcher)
     }
 
     /**
      * Возвращает Main-диспетчер в исходное состояние после завершения теста.
      */
-    override fun finished(description: Description) {
+    override fun afterEach(context: ExtensionContext) {
         Dispatchers.resetMain()
     }
 }

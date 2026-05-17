@@ -3,10 +3,10 @@ package io.ii.data.mapper
 import io.ii.data.local.task.entity.TaskEntity
 import io.ii.data.remote.dto.TaskDto
 import io.ii.domain.model.Task
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertThrows
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
 
 /**
  * Проверяет бизнес-правила преобразования задач между доменной моделью, сущностями БД и DTO.

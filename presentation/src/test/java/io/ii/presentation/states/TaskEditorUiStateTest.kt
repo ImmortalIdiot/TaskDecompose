@@ -1,9 +1,9 @@
 package io.ii.presentation.states
 
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 /**
  * Проверяет вычисляемые свойства и операции состояния редактора задачи.
@@ -64,6 +64,5 @@ class TaskEditorUiStateTest {
 
         assertEquals(5, params.depth)
         assertTrue(params.hasPriority)
-        assertFalse(params.hasTimeEstimation)
     }
 }

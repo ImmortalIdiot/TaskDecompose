@@ -49,8 +49,7 @@ internal data class TaskEditorUiState(
     fun toDecompositionParams(): DecompositionParams =
         DecompositionParams(
             depth = depth,
-            hasPriority = hasPriority,
-            hasTimeEstimation = false
+            hasPriority = hasPriority
         )
 
     /**

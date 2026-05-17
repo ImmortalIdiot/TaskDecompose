@@ -13,11 +13,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 /**
@@ -27,7 +27,8 @@ import org.junit.Test
  */
 class TaskEditViewModelTest {
 
-    @get:Rule
+    @RegisterExtension
+    @JvmField
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeTaskRepository()
@@ -87,7 +88,11 @@ class TaskEditViewModelTest {
         viewModel.onDepthChange(4)
         viewModel.onPriorityChange(true)
         viewModel.decomposeTask()
-        waitUntil { repository.decomposeCall != null && viewModel.uiState.value.id == "TaskId" }
+        waitUntil {
+            repository.decomposeCall != null &&
+                viewModel.uiState.value.id == "TaskId" &&
+                repository.updatedTask?.id == "TaskId"
+        }
 
         assertEquals("Task", repository.decomposeCall?.taskTitle)
         assertNull(repository.decomposeCall?.taskDescription)
@@ -181,7 +186,10 @@ class TaskEditViewModelTest {
         viewModel.loadTask("TaskId")
         waitUntil { viewModel.uiState.value.id == "TaskId" }
         viewModel.deleteTask()
-        waitUntil { repository.deletedTaskId != null }
+        waitUntil {
+            repository.deletedTaskId != null &&
+                viewModel.uiState.value.successMessage == "Deleted"
+        }
 
         assertEquals("TaskId", repository.deletedTaskId)
         assertEquals(

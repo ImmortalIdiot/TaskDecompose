@@ -2,9 +2,9 @@ package io.ii.data.repository
 
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 /**
  * Проверяет формирование промпта для декомпозиции задачи.
@@ -27,8 +27,7 @@ class PromptBuilderTest {
             ),
             params = DecompositionParams(
                 depth = 3,
-                hasPriority = false,
-                hasTimeEstimation = false
+                hasPriority = false
             )
         )
 
@@ -37,7 +36,6 @@ class PromptBuilderTest {
         assertTrue(prompt.contains("depth: 3"))
         assertTrue(prompt.contains("Глубина вложенности subtasks не должна превышать 3"))
         assertFalse(prompt.contains("Учитывай приоритетность"))
-        assertFalse(prompt.contains("примерную длительность"))
     }
 
     /**
@@ -54,13 +52,11 @@ class PromptBuilderTest {
             ),
             params = DecompositionParams(
                 depth = 2,
-                hasPriority = true,
-                hasTimeEstimation = true
+                hasPriority = true
             )
         )
 
         assertTrue(prompt.contains("description: null"))
         assertTrue(prompt.contains("Учитывай приоритетность"))
-        assertTrue(prompt.contains("примерную длительность"))
     }
 }

@@ -7,10 +7,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -23,7 +23,8 @@ import java.time.ZoneOffset
  */
 class HistoryViewModelTest {
 
-    @get:Rule
+    @RegisterExtension
+    @JvmField
     val mainDispatcherRule = MainDispatcherRule()
 
     private val clock = Clock.fixed(
