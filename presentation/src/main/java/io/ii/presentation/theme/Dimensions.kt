@@ -61,5 +61,7 @@ internal data class Other(
 
     val treeLineStrokeWidth: Dp = 2.dp,
     val branchRadius: Dp = 8.dp,
-    val centerLineHeight: Dp = 14.dp
+    val centerLineHeight: Dp = 14.dp,
+
+    val elevation: Dp = 6.dp
 )

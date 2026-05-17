@@ -18,7 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.ii.presentation.screens.PreviewScreen
+import io.ii.presentation.theme.LocalDimensions
 
 @Composable
 internal fun TaskEditSnackbar(
@@ -27,6 +30,8 @@ internal fun TaskEditSnackbar(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val dimensions = LocalDimensions.current
+
     AnimatedVisibility(
         modifier = modifier,
         visible = !message.isNullOrBlank(),
@@ -46,15 +51,15 @@ internal fun TaskEditSnackbar(
             } else {
                 MaterialTheme.colorScheme.inverseOnSurface
             },
-            tonalElevation = 6.dp,
-            shadowElevation = 6.dp
+            tonalElevation = dimensions.other.elevation,
+            shadowElevation = dimensions.other.elevation
         ) {
             Row(
                 modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 12.dp,
-                    end = if (isError) 4.dp else 16.dp,
-                    bottom = 12.dp
+                    start = dimensions.padding.paddingM,
+                    top = dimensions.padding.padding12,
+                    end = if (isError) dimensions.padding.padding4 else dimensions.padding.paddingM,
+                    bottom = dimensions.padding.padding12
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -75,4 +80,32 @@ internal fun TaskEditSnackbar(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun SuccessTaskEditSnackbarPreview() {
+    PreviewScreen(
+        content = {
+            TaskEditSnackbar(
+                message = "Успех",
+                isError = false,
+                onDismiss = {}
+            )
+        }
+    )
+}
+
+@Preview
+@Composable
+private fun ErrorTaskEditSnackbarPreview() {
+    PreviewScreen(
+        content = {
+            TaskEditSnackbar(
+                message = "Ошибка",
+                isError = true,
+                onDismiss = {}
+            )
+        }
+    )
 }
