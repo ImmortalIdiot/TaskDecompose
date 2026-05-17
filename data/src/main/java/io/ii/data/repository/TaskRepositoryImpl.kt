@@ -15,6 +15,7 @@ import io.ii.data.utils.LoggingTags
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
 import io.ii.domain.repository.TaskRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -38,7 +39,7 @@ internal class TaskRepositoryImpl(
 
         val token = getValidAccessToken()
 
-        val result = api.decomposeTask(
+        val result = decomposeTaskWithRetry(
             token = token.accessToken,
             prompt = prompt
         )
@@ -101,5 +102,36 @@ internal class TaskRepositoryImpl(
     private fun GigaChatAccessToken.isValid(): Boolean {
         return accessToken.isNotBlank() &&
                 expiresAt > System.currentTimeMillis() + Constants.TOKEN_EXPIRATION_SAFETY_TIMEOUT_MILLIS
+    }
+
+    private suspend fun decomposeTaskWithRetry(
+        token: String,
+        prompt: String
+    ) = retryOnDecompositionError {
+        api.decomposeTask(
+            token = token,
+            prompt = prompt
+        )
+    }
+
+    private suspend fun <T> retryOnDecompositionError(block: suspend () -> T): T {
+        repeat(MAX_DECOMPOSITION_ATTEMPTS - 1) { attemptIndex ->
+            try {
+                return block()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Timber.tag(LoggingTags.TASK_REPOSITORY).w(
+                    error,
+                    "Decomposition attempt ${attemptIndex + 1}/$MAX_DECOMPOSITION_ATTEMPTS failed. Retrying."
+                )
+            }
+        }
+
+        return block()
+    }
+
+    private companion object {
+        const val MAX_DECOMPOSITION_ATTEMPTS = 2
     }
 }
