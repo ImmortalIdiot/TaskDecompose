@@ -1,6 +1,6 @@
 package io.ii.data.model
 
-import io.ii.data.remote.dto.DecompositionApiResult
+import io.ii.data.remote.dto.common.DecompositionApiResult
 
 /**
  * Клиент языковой модели, способный выполнить декомпозицию по готовому промпту.

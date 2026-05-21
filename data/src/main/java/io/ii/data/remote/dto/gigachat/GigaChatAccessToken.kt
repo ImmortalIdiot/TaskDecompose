@@ -1,4 +1,4 @@
-package io.ii.data.remote.dto
+package io.ii.data.remote.dto.gigachat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,7 +1,7 @@
-package io.ii.data.remote.dto
+package io.ii.data.remote.dto.common
 
 /**
- * Результат запроса декомпозиции к GigaChat API.
+ * Результат запроса декомпозиции к API модели.
  *
  * Объединяет распарсенные подзадачи, статистику расхода токенов и длительность сетевого запроса.
  *
@@ -11,6 +11,6 @@ package io.ii.data.remote.dto
  */
 internal data class DecompositionApiResult(
     val tasks: List<TaskDto>,
-    val usage: GigaChatUsage?,
+    val usage: TokenUsage?,
     val requestResponseDurationMillis: Long
 )

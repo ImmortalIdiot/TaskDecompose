@@ -1,5 +1,6 @@
-package io.ii.data.remote.dto
+package io.ii.data.remote.dto.gigachat
 
+import io.ii.data.remote.dto.common.ChatMessage
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,6 +13,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 internal data class GigaChatRequest(
-    val messages: List<GigaChatMessage>,
+    val messages: List<ChatMessage>,
     val model: String
 )

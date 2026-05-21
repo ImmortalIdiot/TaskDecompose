@@ -1,4 +1,4 @@
-package io.ii.data.remote.dto
+package io.ii.data.remote.dto.common
 
 import kotlinx.serialization.Serializable
 

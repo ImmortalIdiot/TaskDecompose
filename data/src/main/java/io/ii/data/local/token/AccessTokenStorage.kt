@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import io.ii.data.remote.dto.GigaChatAccessToken
+import io.ii.data.remote.dto.gigachat.GigaChatAccessToken
 import kotlinx.coroutines.flow.first
 
 /**

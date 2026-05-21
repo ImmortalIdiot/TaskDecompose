@@ -1,6 +1,6 @@
 package io.ii.data.repository
 
-import io.ii.data.remote.dto.TaskDto
+import io.ii.data.remote.dto.common.TaskDto
 import io.ii.domain.model.Task
 import java.util.UUID
 

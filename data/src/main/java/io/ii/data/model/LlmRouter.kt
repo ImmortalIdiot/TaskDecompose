@@ -2,7 +2,7 @@ package io.ii.data.model
 
 import io.ii.data.remote.api.custom.CustomModelApi
 import io.ii.data.remote.api.gigachat.GigaChatApi
-import io.ii.data.remote.dto.DecompositionApiResult
+import io.ii.data.remote.dto.common.DecompositionApiResult
 import io.ii.domain.model.LlmSettings
 import io.ii.domain.repository.LlmSettingsRepository
 import io.ktor.client.HttpClient

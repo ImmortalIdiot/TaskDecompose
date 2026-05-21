@@ -1,9 +1,9 @@
-package io.ii.data.remote.dto
+package io.ii.data.remote.dto.common
 
 import kotlinx.serialization.Serializable
 
 /**
- * DTO сообщения для GigaChat API.
+ * DTO сообщения для OpenAI-совместимого chat API.
  *
  * Используется для отправки пользовательского сообщения и чтения сообщения модели из ответа API.
  *
@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  * @property role роль автора сообщения
  */
 @Serializable
-internal data class GigaChatMessage(
+internal data class ChatMessage(
     val content: String,
     val role: String
 )

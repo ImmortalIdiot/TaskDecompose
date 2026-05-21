@@ -1,7 +1,7 @@
 package io.ii.data.mapper
 
 import io.ii.data.local.task.entity.TaskEntity
-import io.ii.data.remote.dto.TaskDto
+import io.ii.data.remote.dto.common.TaskDto
 import io.ii.data.repository.TaskCreator
 import io.ii.domain.model.Task
 

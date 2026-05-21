@@ -4,11 +4,11 @@ import android.os.SystemClock
 import io.ii.data.BuildConfig
 import io.ii.data.local.token.AccessTokenStorage
 import io.ii.data.model.LlmClient
-import io.ii.data.remote.dto.DecompositionApiResult
-import io.ii.data.remote.dto.GigaChatAccessToken
-import io.ii.data.remote.dto.GigaChatMessage
-import io.ii.data.remote.dto.GigaChatRequest
-import io.ii.data.remote.dto.GigaChatResponse
+import io.ii.data.remote.dto.common.DecompositionApiResult
+import io.ii.data.remote.dto.gigachat.GigaChatAccessToken
+import io.ii.data.remote.dto.common.ChatMessage
+import io.ii.data.remote.dto.gigachat.GigaChatRequest
+import io.ii.data.remote.dto.gigachat.GigaChatResponse
 import io.ii.data.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -51,7 +51,7 @@ internal class GigaChatApi(
             setBody(
                 GigaChatRequest(
                     messages = listOf(
-                        GigaChatMessage(
+                        ChatMessage(
                             role = Constants.USER_ROLE,
                             content = prompt
                         )

@@ -1,6 +1,6 @@
 package io.ii.data.repository
 
-import io.ii.data.remote.dto.TaskDto
+import io.ii.data.remote.dto.common.TaskDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNull
