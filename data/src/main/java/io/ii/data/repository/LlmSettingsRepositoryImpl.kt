@@ -5,9 +5,14 @@ import io.ii.domain.model.LlmSettings
 import io.ii.domain.repository.LlmSettingsRepository
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Реализация [LlmSettingsRepository].
+ */
 internal class LlmSettingsRepositoryImpl(
     private val storage: LlmSettingsStorage
 ) : LlmSettingsRepository {
+
+    override fun observeSettings(): Flow<LlmSettings> = storage.observeSettings()
 
     override suspend fun getSettings(): LlmSettings = storage.getSettings()
 
