@@ -1,7 +1,7 @@
 package io.ii.data.mapper
 
 import io.ii.data.local.task.entity.TaskEntity
-import io.ii.data.remote.dto.TaskDto
+import io.ii.data.remote.dto.common.TaskDto
 import io.ii.domain.model.Task
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
