@@ -1,6 +1,7 @@
 <resources>
     <string name="task_editor_item_title">Декомпозиция</string>
     <string name="history_item_title">История</string>
+    <string name="model_settings_item_title">Модель</string>
     <string name="history_empty">История пока пуста</string>
     <string name="history_clear_dialog_title">Очистить историю?</string>
     <string name="history_clear_all_dialog_text">Вы уверены, что хотите очистить всю историю?</string>
@@ -20,4 +21,26 @@
     <string name="task_decomposition_params">Параметры декомпозиции</string>
     <string name="task_decomposition_depth">Глубина: %d</string>
     <string name="task_decomposition_priority">Учитывать приоритет</string>
+    <string name="task_decomposition_service_hint">Используется %s</string>
+    <string name="task_decomposition_gigachat_service">GigaChat - %s</string>
+    <string name="task_decomposition_custom_service">Своя модель - %s</string>
+
+    <string name="model_settings_title">Модель</string>
+    <string name="model_settings_provider">API</string>
+    <string name="model_provider_gigachat">GigaChat</string>
+    <string name="model_provider_custom">Своя</string>
+    <string name="model_settings_add_model">Добавить</string>
+    <string name="model_settings_delete_model">Удалить модель</string>
+    <string name="model_settings_custom_name">Название</string>
+    <string name="model_settings_custom_unnamed">Без названия</string>
+    <string name="model_settings_gigachat_hint">GigaChat используется по умолчанию и не требует дополнительных настроек.</string>
+    <string name="model_settings_model">Модель</string>
+    <string name="model_settings_model_optional">Модель, если нужна</string>
+    <string name="model_settings_chat_endpoint">Эндпоинт модели</string>
+    <string name="model_settings_token_endpoint">Эндпоинт токена, если нужен</string>
+    <string name="model_settings_auth_token">Ключ или токен авторизации</string>
+    <string name="model_settings_response_path">Путь к тексту ответа</string>
+    <string name="model_settings_token_path">Путь к токену</string>
+    <string name="model_settings_save">Сохранить</string>
+    <string name="model_settings_saved">Настройки модели сохранены</string>
 </resources>

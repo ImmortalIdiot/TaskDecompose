@@ -10,6 +10,8 @@ internal object Constants {
     const val SLIDE_ANIMATION_DURATION: Int = 350 // in millis
     const val FADE_ANIMATION_DURATION: Int = 250 // in millis
 
+    const val SETTINGS_SNACKBAR_DURATION = 3_000L // in millis
+
     const val MIN_DECOMPOSITION_DEPTH = 1f
     const val MAX_DECOMPOSITION_DEPTH = 5f
 
