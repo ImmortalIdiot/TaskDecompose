@@ -3,14 +3,18 @@ package io.ii.data.di
 import android.content.Context
 import androidx.room.Room
 import io.ii.data.R
+import io.ii.data.local.model.LlmSettingsStorage
 import io.ii.data.local.task.TaskDatabase
 import io.ii.data.local.task.dao.TaskDao
 import io.ii.data.local.token.AccessTokenStorage
 import io.ii.data.metrics.FirebaseMetricsReporter
 import io.ii.data.metrics.MetricsReporter
-import io.ii.data.remote.api.GigaChatApi
+import io.ii.data.model.LlmRouter
+import io.ii.data.remote.api.gigachat.GigaChatApi
+import io.ii.data.repository.LlmSettingsRepositoryImpl
 import io.ii.data.repository.TaskRepositoryImpl
 import io.ii.data.utils.Constants
+import io.ii.domain.repository.LlmSettingsRepository
 import io.ii.domain.repository.TaskRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -26,7 +30,9 @@ import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import java.security.KeyStore
+import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
@@ -37,12 +43,15 @@ val dataModule = module {
 
     single { provideOkHttpClient(androidContext()) }
     single { provideApiClient(get()) }
-    single { GigaChatApi(get()) }
     single { AccessTokenStorage(androidContext()) }
+    single { GigaChatApi(get(), get()) }
+    single { LlmSettingsStorage(androidContext()) }
+    single<LlmSettingsRepository> { LlmSettingsRepositoryImpl(get()) }
+    single { LlmRouter(get(), get(), get()) }
     single<MetricsReporter> { FirebaseMetricsReporter(androidContext()) }
 
     single<TaskRepository> {
-        provideRepository(get(), get(), get(), get(), get())
+        provideRepository(get(), get(), get(), get())
     }
 }
 
@@ -67,8 +76,7 @@ private fun provideDao(db: TaskDatabase): TaskDao = db.taskDao()
  *
  * @param dao DAO для доступа к локальным задачам
  * @param db БД с задачами для создания собственных транзакций
- * @param api API клиента GigaChat
- * @param tokenStorage хранилище токена доступа для GigaChat API
+ * @param llmRouter роутер выбранного API модели
  * @param metricsReporter отправитель метрик приложения
  *
  * @return реализация [TaskRepository]
@@ -76,14 +84,12 @@ private fun provideDao(db: TaskDatabase): TaskDao = db.taskDao()
 private fun provideRepository(
     dao: TaskDao,
     db: TaskDatabase,
-    api: GigaChatApi,
-    tokenStorage: AccessTokenStorage,
+    llmRouter: LlmRouter,
     metricsReporter: MetricsReporter
 ): TaskRepository = TaskRepositoryImpl(
     dao = dao,
     db = db,
-    api = api,
-    tokenStorage = tokenStorage,
+    llmRouter = llmRouter,
     metricsReporter = metricsReporter
 )
 
@@ -110,6 +116,7 @@ private fun provideApiClient(
                 Json {
                     ignoreUnknownKeys = true
                     explicitNulls = false
+                    encodeDefaults = false
                     isLenient = true
                 }
             )
@@ -132,7 +139,7 @@ private const val CERTIFICATE_FACTORY_INSTANCE = "X.509"
 private const val SSL_PROTOCOL = "TLS"
 
 /**
- * Создает OkHttp client с доверенными сертификатами Минцифры, поставляемыми в ресурсах приложения.
+ * Создает OkHttp client с системными доверенными сертификатами и сертификатами Минцифры.
  *
  * @param context Android context для чтения raw ресурсов сертификатов
  *
@@ -163,15 +170,21 @@ private fun provideOkHttpClient(
         }
     }
 
-    val trustManagerFactory = TrustManagerFactory.getInstance(
+    val defaultTrustManager = TrustManagerFactory.getInstance(
+        TrustManagerFactory.getDefaultAlgorithm()
+    ).apply {
+        init(null as KeyStore?)
+    }.x509TrustManager()
+
+    val customTrustManager = TrustManagerFactory.getInstance(
         TrustManagerFactory.getDefaultAlgorithm()
     ).apply {
         init(keyStore)
-    }
+    }.x509TrustManager()
 
-    val trustManager = trustManagerFactory.trustManagers
-        .filterIsInstance<X509TrustManager>()
-        .first()
+    val trustManager = CompositeX509TrustManager(
+        trustManagers = listOf(defaultTrustManager, customTrustManager)
+    )
 
     val sslContext = SSLContext.getInstance(SSL_PROTOCOL).apply {
         init(null, arrayOf(trustManager), null)
@@ -181,4 +194,54 @@ private fun provideOkHttpClient(
         .Builder()
         .sslSocketFactory(sslContext.socketFactory, trustManager)
         .build()
+}
+
+private fun TrustManagerFactory.x509TrustManager(): X509TrustManager {
+    return trustManagers
+        .filterIsInstance<X509TrustManager>()
+        .first()
+}
+
+private class CompositeX509TrustManager(
+    private val trustManagers: List<X509TrustManager>
+) : X509TrustManager {
+
+    override fun checkClientTrusted(
+        chain: Array<out X509Certificate>?,
+        authType: String?
+    ) {
+        checkTrusted { trustManager ->
+            trustManager.checkClientTrusted(chain, authType)
+        }
+    }
+
+    override fun checkServerTrusted(
+        chain: Array<out X509Certificate>?,
+        authType: String?
+    ) {
+        checkTrusted { trustManager ->
+            trustManager.checkServerTrusted(chain, authType)
+        }
+    }
+
+    override fun getAcceptedIssuers(): Array<X509Certificate> {
+        return trustManagers
+            .flatMap { trustManager -> trustManager.acceptedIssuers.toList() }
+            .toTypedArray()
+    }
+
+    private fun checkTrusted(block: (X509TrustManager) -> Unit) {
+        var lastError: CertificateException? = null
+
+        trustManagers.forEach { trustManager ->
+            try {
+                block(trustManager)
+                return
+            } catch (error: CertificateException) {
+                lastError = error
+            }
+        }
+
+        throw lastError ?: CertificateException("No trust manager accepted certificate chain")
+    }
 }
