@@ -1,16 +1,21 @@
 package io.ii.presentation.viewmodels
 
+import io.ii.domain.model.LlmSettings
 import io.ii.domain.model.Task
 import io.ii.domain.usecase.DecomposeTaskUseCase
 import io.ii.domain.usecase.DeleteTaskUseCase
 import io.ii.domain.usecase.GetTaskUseCase
+import io.ii.domain.usecase.ObserveLlmSettingsUseCase
 import io.ii.domain.usecase.UpdateTaskUseCase
+import io.ii.domain.repository.LlmSettingsRepository
 import io.ii.presentation.R
 import io.ii.presentation.core.NetworkProvider
 import io.ii.presentation.core.ResourceProvider
 import io.ii.presentation.states.TaskEditorUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,6 +37,7 @@ class TaskEditViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeTaskRepository()
+    private val settingsRepository = FakeLlmSettingsRepository()
     private val networkProvider = FakeNetworkProvider()
     private val resourceProvider = FakeResourceProvider()
 
@@ -40,6 +46,7 @@ class TaskEditViewModelTest {
         getTaskUseCase = GetTaskUseCase(repository),
         updateTaskUseCase = UpdateTaskUseCase(repository),
         deleteTaskUseCase = DeleteTaskUseCase(repository),
+        observeLlmSettingsUseCase = ObserveLlmSettingsUseCase(settingsRepository),
         networkProvider = networkProvider,
         resourceProvider = resourceProvider
     )
@@ -192,10 +199,9 @@ class TaskEditViewModelTest {
         }
 
         assertEquals("TaskId", repository.deletedTaskId)
-        assertEquals(
-            TaskEditorUiState(successMessage = "Deleted"),
-            viewModel.uiState.value
-        )
+        assertNull(viewModel.uiState.value.id)
+        assertEquals("", viewModel.uiState.value.title)
+        assertEquals("Deleted", viewModel.uiState.value.successMessage)
     }
 
     /**
@@ -212,7 +218,10 @@ class TaskEditViewModelTest {
         viewModel.deleteTask()
 
         assertNull(repository.deletedTaskId)
-        assertEquals(TaskEditorUiState(), viewModel.uiState.value)
+        assertEquals("", viewModel.uiState.value.title)
+        assertEquals("", viewModel.uiState.value.description)
+        assertEquals(2, viewModel.uiState.value.depth)
+        assertEquals(false, viewModel.uiState.value.hasPriority)
     }
 
     private fun persistedTask() = Task(
@@ -254,5 +263,17 @@ class TaskEditViewModelTest {
                 R.string.delete_task_success -> "Deleted"
                 else -> error("Unknown string resource: $resId")
             }
+    }
+
+    private class FakeLlmSettingsRepository : LlmSettingsRepository {
+        private val settings = MutableStateFlow(LlmSettings())
+
+        override fun observeSettings(): Flow<LlmSettings> = settings
+
+        override suspend fun getSettings(): LlmSettings = settings.value
+
+        override suspend fun saveSettings(settings: LlmSettings) {
+            this.settings.value = settings
+        }
     }
 }

@@ -1,22 +1,24 @@
 package io.ii.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
+import io.ii.domain.model.LlmSettings
 import io.ii.domain.usecase.DecomposeTaskUseCase
 import io.ii.domain.usecase.DeleteTaskUseCase
 import io.ii.domain.usecase.GetTaskUseCase
+import io.ii.domain.usecase.ObserveLlmSettingsUseCase
 import io.ii.domain.usecase.UpdateTaskUseCase
 import io.ii.presentation.R
 import io.ii.presentation.core.NetworkProvider
 import io.ii.presentation.core.ResourceProvider
 import io.ii.presentation.core.launchSafe
 import io.ii.presentation.states.TaskEditorUiState
-import io.ii.presentation.utils.Constants
 import io.ii.presentation.utils.LoggingTags
 import io.ii.presentation.utils.toDomain
 import io.ii.presentation.utils.toEditorUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
@@ -34,6 +36,7 @@ internal class TaskEditViewModel(
     private val getTaskUseCase: GetTaskUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val observeLlmSettingsUseCase: ObserveLlmSettingsUseCase,
     private val networkProvider: NetworkProvider,
     private val resourceProvider: ResourceProvider
 ) : ViewModel() {
@@ -42,13 +45,25 @@ internal class TaskEditViewModel(
     val uiState: StateFlow<TaskEditorUiState> = _uiState.asStateFlow()
 
     private var loadedTaskId: String? = null
+    private var llmSettings: LlmSettings = LlmSettings()
+
+    init {
+        launchSafe {
+            observeLlmSettingsUseCase().collectLatest { settings ->
+                llmSettings = settings
+                _uiState.update { state ->
+                    state.withLlmSettings(settings)
+                }
+            }
+        }
+    }
 
     /**
      * Переводит редактор в режим создания новой задачи.
      */
     fun createNewTask() {
         loadedTaskId = null
-        _uiState.value = TaskEditorUiState()
+        _uiState.value = TaskEditorUiState().withLlmSettings(llmSettings)
     }
 
     /**
@@ -91,7 +106,7 @@ internal class TaskEditViewModel(
             }
 
             loadedTaskId = taskId
-            _uiState.value = task.toEditorUiState()
+            _uiState.value = task.toEditorUiState().withLlmSettings(llmSettings)
         }
     }
 
@@ -147,7 +162,7 @@ internal class TaskEditViewModel(
                 createdAt = state.createdAt ?: decomposedTask.createdAt,
                 depth = state.depth,
                 hasPriority = state.hasPriority
-            )
+            ).withLlmSettings(llmSettings)
 
             _uiState.value = updatedTaskState
 
@@ -223,7 +238,7 @@ internal class TaskEditViewModel(
 
                 _uiState.value = TaskEditorUiState(
                     successMessage = resourceProvider.getString(R.string.delete_task_success)
-                )
+                ).withLlmSettings(llmSettings)
             } else {
                 debug("Clear input form")
 
@@ -231,6 +246,18 @@ internal class TaskEditViewModel(
             }
         }
     }
+
+    private fun TaskEditorUiState.withLlmSettings(settings: LlmSettings): TaskEditorUiState =
+        copy(
+            selectedLlmModelId = settings.selectedModelId,
+            selectedLlmName = if (settings.selectedModelId == LlmSettings.GIGACHAT_MODEL_ID) {
+                settings.gigaChatModel
+            } else {
+                settings.customModels.firstOrNull { model ->
+                    model.id == settings.selectedModelId
+                }?.name.orEmpty()
+            }
+        )
 
     /**
      * Очищает сообщение об ошибке.

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -23,7 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.ii.domain.model.LlmSettings
+import io.ii.presentation.R
 import io.ii.presentation.components.bars.TaskEditSnackbar
 import io.ii.presentation.components.bars.TaskEditorTopBar
 import io.ii.presentation.components.cards.DecompositionParamsCard
@@ -37,6 +42,7 @@ import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
 private const val TASK_TITLE_ITEM_KEY = "title"
+private const val TASK_MODEL_SERVICE_ITEM_KEY = "model_service"
 private const val TASK_DESCRIPTION_ITEM_KEY = "description"
 private const val TASK_PARAMS_ITEM_KEY = "params"
 private const val TASK_PROGRESS_INDICATOR_ITEM_KEY = "progress_indicator"
@@ -77,6 +83,10 @@ internal fun TaskEditScreen(
     val dimensions = LocalDimensions.current
     val snackbarMessage = uiState.errorMessage ?: uiState.successMessage
     val isErrorSnackbar = uiState.errorMessage != null
+    val modelServiceLabel = taskModelServiceLabel(
+        selectedModelId = uiState.selectedLlmModelId,
+        selectedModelName = uiState.selectedLlmName
+    )
 
     LaunchedEffect(taskId) {
         if (taskId == null) {
@@ -163,6 +173,19 @@ internal fun TaskEditScreen(
                     )
                 }
 
+                if (modelServiceLabel.isNotBlank()) {
+                    item(key = TASK_MODEL_SERVICE_ITEM_KEY) {
+                        Text(
+                            text = stringResource(
+                                R.string.task_decomposition_service_hint,
+                                modelServiceLabel
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
                 if (uiState.isLoading) {
                     item(key = TASK_PROGRESS_INDICATOR_ITEM_KEY) {
                         LinearProgressIndicator(
@@ -212,3 +235,15 @@ private fun Rect.contains(other: Rect): Boolean =
             other.top >= top &&
             other.right <= right &&
             other.bottom <= bottom
+
+@Composable
+private fun taskModelServiceLabel(
+    selectedModelId: String,
+    selectedModelName: String
+): String {
+    return if (selectedModelId == LlmSettings.GIGACHAT_MODEL_ID) {
+        stringResource(R.string.task_decomposition_gigachat_service, selectedModelName)
+    } else {
+        stringResource(R.string.task_decomposition_custom_service, selectedModelName)
+    }
+}
