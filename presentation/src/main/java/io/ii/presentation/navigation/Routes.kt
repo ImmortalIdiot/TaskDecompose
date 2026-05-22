@@ -24,13 +24,20 @@ internal sealed class Route(val index: Int) {
     @Serializable
     data object History : Route(HISTORY_INDEX)
 
+    /**
+     * Экран выбора модели и параметров доступа к API.
+     */
+    @Serializable
+    data object ModelSettings : Route(MODEL_SETTINGS_INDEX)
+
     companion object {
         /**
          * Все маршруты, отображаемые в нижней навигации.
          */
-        val ALL = listOf(TaskEditor(), History)
+        val ALL = listOf(TaskEditor(), History, ModelSettings)
 
         private const val TASK_EDITOR_INDEX = 0
         private const val HISTORY_INDEX = 1
+        private const val MODEL_SETTINGS_INDEX = 2
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.ii.presentation.navigation.Route
 import io.ii.presentation.screens.HistoryScreen
+import io.ii.presentation.screens.LlmSettingsScreen
 import io.ii.presentation.screens.TaskEditScreen
 import io.ii.presentation.utils.Constants
 
@@ -56,6 +57,10 @@ internal fun TaskDecomposeContent(
 
             Route.History -> {
                 HistoryScreen(onTaskClick = onTaskClick)
+            }
+
+            Route.ModelSettings -> {
+                LlmSettingsScreen()
             }
         }
     }

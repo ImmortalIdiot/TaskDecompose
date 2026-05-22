@@ -47,7 +47,15 @@ private fun TaskDecomposeNavigation(
                 if (selectedRoute == Route.History) {
                     backStack
                 } else {
-                    Route.ALL
+                    listOf(Route.TaskEditor(), Route.History)
+                }
+            }
+
+            Route.ModelSettings -> {
+                if (selectedRoute == Route.ModelSettings) {
+                    backStack
+                } else {
+                    listOf(Route.TaskEditor(), Route.History, Route.ModelSettings)
                 }
             }
         }

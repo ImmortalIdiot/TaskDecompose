@@ -4,6 +4,7 @@ import androidx.compose.runtime.saveable.Saver
 
 private const val TASK_EDITOR_SCREEN_NAME = "task_editor"
 private const val HISTORY_SCREEN_NAME = "history"
+private const val MODEL_SETTINGS_SCREEN_NAME = "model_settings"
 
 /**
  * Saver для сохранения и восстановления состояния маршрута навигации.
@@ -20,6 +21,8 @@ internal val RouteBackStackSaver = Saver<List<Route>, List<String>>(
                 } ?: TASK_EDITOR_SCREEN_NAME
 
                 Route.History -> HISTORY_SCREEN_NAME
+
+                Route.ModelSettings -> MODEL_SETTINGS_SCREEN_NAME
             }
         }
     },
@@ -27,6 +30,7 @@ internal val RouteBackStackSaver = Saver<List<Route>, List<String>>(
         screenNames.map { screenName ->
             when (screenName) {
                 HISTORY_SCREEN_NAME -> Route.History
+                MODEL_SETTINGS_SCREEN_NAME -> Route.ModelSettings
                 TASK_EDITOR_SCREEN_NAME -> Route.TaskEditor()
                 else -> {
                     val taskId = screenName.substringAfter(

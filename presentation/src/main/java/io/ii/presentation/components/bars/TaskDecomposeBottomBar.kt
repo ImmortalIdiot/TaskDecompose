@@ -3,6 +3,7 @@ package io.ii.presentation.components.bars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.HistoryEdu
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.NavigationBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,6 +45,15 @@ internal fun TaskDecomposeBottomBar(
             onClick = { onRouteClick(Route.History) },
             icon = Icons.Outlined.HistoryEdu,
             text = stringResource(R.string.history_item_title)
+        )
+
+        BottomBarItem(
+            modifier = Modifier.weight(1f),
+            selected = selectedRoute == Route.ModelSettings,
+            enabled = selectedRoute != Route.ModelSettings,
+            onClick = { onRouteClick(Route.ModelSettings) },
+            icon = Icons.Outlined.Settings,
+            text = stringResource(R.string.model_settings_item_title)
         )
     }
 }
