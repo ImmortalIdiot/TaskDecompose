@@ -1,6 +1,8 @@
 package io.ii.presentation.utils
 
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
+import io.ii.presentation.states.HistoryTaskUiState
 import io.ii.presentation.states.SubtaskState
 import io.ii.presentation.states.TaskEditorUiState
 
@@ -59,6 +61,17 @@ internal fun TaskEditorUiState.toDomain(): Task? {
         subtasks = subtasks.map { it.toDomain() }
     )
 }
+
+/**
+ * Преобразует элемент истории в UI state карточки истории.
+ *
+ * @return UI state карточки истории
+ */
+internal fun TaskHistoryItem.toHistoryTaskUiState(): HistoryTaskUiState =
+    HistoryTaskUiState(
+        task = task.toEditorItemUiState(),
+        llmModelName = llmModelName
+    )
 
 /**
  * Преобразует UI state подзадачи в доменную модель.

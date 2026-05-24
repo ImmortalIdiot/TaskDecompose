@@ -48,6 +48,7 @@ import io.ii.presentation.screens.PreviewScreen
 internal fun HistoryItemCard(
     title: String,
     description: String?,
+    llmModelName: String?,
     subtasks: List<SubtaskState>,
     isSelected: Boolean,
     onItemClick: () -> Unit,
@@ -87,6 +88,7 @@ internal fun HistoryItemCard(
             HistoryItemHeader(
                 title = title,
                 description = description,
+                llmModelName = llmModelName,
                 expanded = expanded,
                 onClick = { expanded = !expanded }
             )
@@ -125,6 +127,7 @@ private fun Modifier.historyCardClickable(
 private fun HistoryItemHeader(
     title: String,
     description: String?,
+    llmModelName: String?,
     expanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -151,6 +154,18 @@ private fun HistoryItemHeader(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
+
+            if (!llmModelName.isNullOrBlank()) {
+                VerticalSpacer(dimensions.padding.padding4)
+
+                Text(
+                    text = llmModelName,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
             if (!description.isNullOrBlank()) {
                 VerticalSpacer(dimensions.padding.padding4)
@@ -194,6 +209,7 @@ private fun HistoryItemCardPreview() {
                 HistoryItemCard(
                     title = taskText,
                     description = null,
+                    llmModelName = "GigaChat",
                     isSelected = false,
                     onItemClick = {},
                     onItemLongClick = {},
@@ -203,6 +219,7 @@ private fun HistoryItemCardPreview() {
                 HistoryItemCard(
                     title = taskText,
                     description = LoremIpsum(100).values.first(),
+                    llmModelName = "Mistral",
                     isSelected = true,
                     onItemClick = {},
                     onItemLongClick = {},

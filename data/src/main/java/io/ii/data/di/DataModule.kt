@@ -67,7 +67,9 @@ private fun provideDatabase(context: Context): TaskDatabase =
         context = context,
         klass = TaskDatabase::class.java,
         name = TaskDatabase.DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(TaskDatabase.MIGRATION_1_2)
+        .build()
 
 private fun provideDao(db: TaskDatabase): TaskDao = db.taskDao()
 

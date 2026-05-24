@@ -52,7 +52,11 @@ internal class TaskEditViewModel(
             observeLlmSettingsUseCase().collectLatest { settings ->
                 llmSettings = settings
                 _uiState.update { state ->
-                    state.withLlmSettings(settings)
+                    if (state.isEditMode && state.selectedLlmName.isNotBlank()) {
+                        state
+                    } else {
+                        state.withLlmSettings(settings)
+                    }
                 }
             }
         }
@@ -106,7 +110,13 @@ internal class TaskEditViewModel(
             }
 
             loadedTaskId = taskId
-            _uiState.value = task.toEditorUiState().withLlmSettings(llmSettings)
+            _uiState.value = task.toEditorUiState().let { state ->
+                if (state.selectedLlmName.isBlank()) {
+                    state.withLlmSettings(llmSettings)
+                } else {
+                    state
+                }
+            }
         }
     }
 
@@ -172,7 +182,12 @@ internal class TaskEditViewModel(
                 return@launchSafe
             }
 
-            updateTaskUseCase(task)
+            updateTaskUseCase(
+                UpdateTaskUseCase.Params(
+                    task = task,
+                    llmModelName = updatedTaskState.selectedLlmName.takeIf { it.isNotBlank() }
+                )
+            )
         }
     }
 
@@ -203,7 +218,12 @@ internal class TaskEditViewModel(
                 return@launchSafe
             }
 
-            updateTaskUseCase(task)
+            updateTaskUseCase(
+                UpdateTaskUseCase.Params(
+                    task = task,
+                    llmModelName = _uiState.value.selectedLlmName.takeIf { it.isNotBlank() }
+                )
+            )
 
             debug("Saved successfully")
 
@@ -249,7 +269,6 @@ internal class TaskEditViewModel(
 
     private fun TaskEditorUiState.withLlmSettings(settings: LlmSettings): TaskEditorUiState =
         copy(
-            selectedLlmModelId = settings.selectedModelId,
             selectedLlmName = if (settings.selectedModelId == LlmSettings.GIGACHAT_MODEL_ID) {
                 settings.gigaChatModel
             } else {

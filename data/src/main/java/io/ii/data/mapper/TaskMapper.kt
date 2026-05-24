@@ -4,6 +4,7 @@ import io.ii.data.local.task.entity.TaskEntity
 import io.ii.data.remote.dto.common.TaskDto
 import io.ii.data.repository.TaskCreator
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
 
 /**
  * Преобразует доменную модель задачи в сущность базы данных.
@@ -14,13 +15,17 @@ import io.ii.domain.model.Task
  * @param parentId идентификатор родительской задачи. Для корневой задачи равен null
  * @return сущность задачи для хранения в базе данных
  */
-internal fun Task.toEntity(parentId: String? = null): TaskEntity =
+internal fun Task.toEntity(
+    parentId: String? = null,
+    llmModelName: String? = null
+): TaskEntity =
     TaskEntity(
         id = id,
         parentId = parentId,
         title = title,
         description = description,
-        createdAt = createdAt
+        createdAt = createdAt,
+        llmModelName = llmModelName.takeIf { parentId == null }
     )
 
 /**
@@ -31,8 +36,14 @@ internal fun Task.toEntity(parentId: String? = null): TaskEntity =
  * @param parentId идентификатор родительской задачи. Для корневой задачи - null
  * @return список сущностей, включающий текущую задачу и все вложенные подзадачи
  */
-internal fun Task.toEntities(parentId: String? = null): List<TaskEntity> = listOf(
-    toEntity(parentId)
+internal fun Task.toEntities(
+    parentId: String? = null,
+    llmModelName: String? = null
+): List<TaskEntity> = listOf(
+    toEntity(
+        parentId = parentId,
+        llmModelName = llmModelName
+    )
 ) + subtasks.flatMap {
     it.toEntities(parentId = id)
 }
@@ -50,6 +61,26 @@ internal fun List<TaskEntity>.toModelTree(): List<Task> {
     return childrenByParent[null]
         ?.map { entity ->
             entity.toModel(childrenByParent)
+        }
+        .orEmpty()
+}
+
+/**
+ * Преобразует плоский список сущностей задач в список элементов истории.
+ *
+ * Метаданные истории берутся только из корневых задач.
+ *
+ * @return список элементов истории с восстановленными деревьями задач
+ */
+internal fun List<TaskEntity>.toHistoryModelTree(): List<TaskHistoryItem> {
+    val childrenByParent = groupBy { it.parentId }
+
+    return childrenByParent[null]
+        ?.map { entity ->
+            TaskHistoryItem(
+                task = entity.toModel(childrenByParent),
+                llmModelName = entity.llmModelName
+            )
         }
         .orEmpty()
 }

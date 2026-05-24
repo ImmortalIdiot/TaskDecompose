@@ -2,6 +2,7 @@ package io.ii.data.repository
 
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
 import io.ii.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,13 @@ import kotlin.math.max
 internal class MockTaskRepository : TaskRepository {
 
     private val mutex = Mutex()
-    private var tasks = createInitialTasks()
-    private val historyFlow = MutableStateFlow(tasks)
+    private var historyItems = createInitialTasks().map { task ->
+        TaskHistoryItem(
+            task = task,
+            llmModelName = "GigaChat"
+        )
+    }
+    private val historyFlow = MutableStateFlow(historyItems)
 
     override suspend fun decomposeTask(
         taskTitle: String,
@@ -37,42 +43,55 @@ internal class MockTaskRepository : TaskRepository {
         task
     }
 
-    override fun loadDecompositionHistory(): Flow<List<Task>> = historyFlow.asStateFlow()
+    override fun loadDecompositionHistory(): Flow<List<TaskHistoryItem>> = historyFlow.asStateFlow()
 
     override suspend fun getTaskById(id: String): Task? = mutex.withLock {
-        tasks.firstNotNullOfOrNull { task -> task.findById(id) }
+        historyItems.firstNotNullOfOrNull { item -> item.task.findById(id) }
     }
 
-    override suspend fun updateTask(task: Task) {
+    override suspend fun updateTask(
+        task: Task,
+        llmModelName: String?
+    ) {
         mutex.withLock {
             var updated = false
 
-            tasks = tasks.map { root ->
+            historyItems = historyItems.map { item ->
+                val root = item.task
+
                 if (root.id == task.id) {
                     updated = true
-                    task
+                    item.copy(
+                        task = task,
+                        llmModelName = llmModelName
+                    )
                 } else {
                     val updatedRoot = root.replaceChild(task)
                     updated = updated || updatedRoot !== root
-                    updatedRoot
+                    item.copy(task = updatedRoot)
                 }
             }
 
             if (!updated) {
-                tasks = listOf(task) + tasks
+                historyItems = listOf(
+                    TaskHistoryItem(
+                        task = task,
+                        llmModelName = llmModelName
+                    )
+                ) + historyItems
             }
 
-            historyFlow.value = tasks
+            historyFlow.value = historyItems
         }
     }
 
     override suspend fun deleteTask(id: String) {
         mutex.withLock {
-            tasks = tasks
-                .filterNot { task -> task.id == id }
-                .map { task -> task.removeChild(id) }
+            historyItems = historyItems
+                .filterNot { item -> item.task.id == id }
+                .map { item -> item.copy(task = item.task.removeChild(id)) }
 
-            historyFlow.value = tasks
+            historyFlow.value = historyItems
         }
     }
 

@@ -1,6 +1,8 @@
 package io.ii.presentation.utils
 
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
+import org.junit.jupiter.api.Assertions.assertFalse
 import io.ii.presentation.states.SubtaskState
 import io.ii.presentation.states.TaskEditorUiState
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -77,5 +79,25 @@ class ModelMapperTest {
         assertEquals("root", task?.id)
         assertNull(task?.description)
         assertEquals("child", task?.subtasks?.single()?.id)
+    }
+
+    /**
+     * Проверяет, что метаданные истории попадают только в UI state карточки истории.
+     */
+    @Test
+    fun `history item maps model name to history card state`() {
+        val state = TaskHistoryItem(
+            task = Task(
+                id = "root",
+                title = "Root",
+                description = null,
+                createdAt = 1L
+            ),
+            llmModelName = "Mistral"
+        ).toHistoryTaskUiState()
+
+        assertEquals("root", state.task.id)
+        assertEquals("Mistral", state.llmModelName)
+        assertFalse(state.task.title.isBlank())
     }
 }

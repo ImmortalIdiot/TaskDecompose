@@ -6,7 +6,7 @@ import io.ii.domain.usecase.LoadDecompositionHistoryUseCase
 import io.ii.presentation.core.launchSafe
 import io.ii.presentation.states.HistoryDateGroupUiState
 import io.ii.presentation.states.HistoryUiState
-import io.ii.presentation.utils.toEditorItemUiState
+import io.ii.presentation.utils.toHistoryTaskUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,18 +63,18 @@ internal class HistoryViewModel(
             loadDecompositionHistoryUseCase()
                 .map { tasks ->
                     tasks
-                        .sortedByDescending { task -> task.createdAt }
-                        .groupBy { task -> task.createdAt.toLocalDate() }
+                        .sortedByDescending { item -> item.task.createdAt }
+                        .groupBy { item -> item.task.createdAt.toLocalDate() }
                         .toSortedMap(compareByDescending { it })
                         .map { (date, tasks) ->
                             HistoryDateGroupUiState(
                                 date = date.formatForHistory(),
-                                tasks = tasks.map { task -> task.toEditorItemUiState() }
+                                tasks = tasks.map { item -> item.toHistoryTaskUiState() }
                             )
                         }
                 }
                 .collect { groups ->
-                    val taskIds = groups.flatMap { group -> group.tasks.map { task -> task.id } }.toSet()
+                    val taskIds = groups.flatMap { group -> group.tasks.map { item -> item.task.id } }.toSet()
 
                     _uiState.update { state ->
                         state.copy(

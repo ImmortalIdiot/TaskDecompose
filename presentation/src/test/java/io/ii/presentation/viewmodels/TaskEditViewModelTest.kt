@@ -109,6 +109,7 @@ class TaskEditViewModelTest {
         assertEquals("SubtaskId", viewModel.uiState.value.subtasks.single().id)
         assertEquals(4, viewModel.uiState.value.depth)
         assertEquals(true, viewModel.uiState.value.hasPriority)
+        assertEquals("GigaChat", repository.updatedTaskLlmModelName)
         assertEquals("TaskId", repository.updatedTask?.id)
         assertEquals("SubtaskId", repository.updatedTask?.subtasks?.single()?.id)
         assertFalse(viewModel.uiState.value.isLoading)

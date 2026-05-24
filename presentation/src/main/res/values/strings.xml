@@ -21,9 +21,6 @@
     <string name="task_decomposition_params">Параметры декомпозиции</string>
     <string name="task_decomposition_depth">Глубина: %d</string>
     <string name="task_decomposition_priority">Учитывать приоритет</string>
-    <string name="task_decomposition_service_hint">Используется %s</string>
-    <string name="task_decomposition_gigachat_service">GigaChat - %s</string>
-    <string name="task_decomposition_custom_service">Своя модель - %s</string>
 
     <string name="model_settings_title">Модель</string>
     <string name="model_settings_provider">API</string>

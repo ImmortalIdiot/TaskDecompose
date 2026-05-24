@@ -14,7 +14,8 @@ import androidx.room.PrimaryKey
  * @param parentId идентификатор родительской задачи;
  * @param title текст задачи;
  * @param description возможное описание задачи;
- * @param createdAt дата создания задачи.
+ * @param createdAt дата создания задачи;
+ * @param llmModelName название модели, использованной для декомпозиции.
  */
 @Entity(
     tableName = "tasks",
@@ -32,5 +33,6 @@ internal data class TaskEntity(
     @ColumnInfo(name = "parent_id") val parentId: String?,
     val title: String,
     val description: String?,
-    @ColumnInfo(name = "created_at") val createdAt: Long
+    @ColumnInfo(name = "created_at") val createdAt: Long,
+    @ColumnInfo(name = "llm_model_name") val llmModelName: String? = null
 )

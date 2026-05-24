@@ -3,15 +3,16 @@ package io.ii.data.repository
 import androidx.room.withTransaction
 import io.ii.data.local.task.TaskDatabase
 import io.ii.data.local.task.dao.TaskDao
+import io.ii.data.mapper.toHistoryModelTree
 import io.ii.data.mapper.toEntities
 import io.ii.data.mapper.toModel
-import io.ii.data.mapper.toModelTree
 import io.ii.data.metrics.MetricsReporter
 import io.ii.data.model.LlmRateLimitException
 import io.ii.data.model.LlmRouter
 import io.ii.data.utils.LoggingTags
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
 import io.ii.domain.repository.TaskRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -52,16 +53,19 @@ internal class TaskRepositoryImpl(
         return tasks
     }
 
-    override fun loadDecompositionHistory(): Flow<List<Task>> {
-        return dao.getAllTasks().map { tasks -> tasks.toModelTree() }
+    override fun loadDecompositionHistory(): Flow<List<TaskHistoryItem>> {
+        return dao.getAllTasks().map { tasks -> tasks.toHistoryModelTree() }
     }
 
     override suspend fun getTaskById(id: String): Task? {
         return dao.getTaskTreeById(id).toModel(id)
     }
 
-    override suspend fun updateTask(task: Task) {
-        val entities = task.toEntities()
+    override suspend fun updateTask(
+        task: Task,
+        llmModelName: String?
+    ) {
+        val entities = task.toEntities(llmModelName = llmModelName)
 
         db.withTransaction {
             dao.deleteTaskById(task.id)

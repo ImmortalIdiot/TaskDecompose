@@ -27,7 +27,6 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.ii.domain.model.LlmSettings
 import io.ii.presentation.R
 import io.ii.presentation.components.bars.TaskEditSnackbar
 import io.ii.presentation.components.bars.TaskEditorTopBar
@@ -83,10 +82,7 @@ internal fun TaskEditScreen(
     val dimensions = LocalDimensions.current
     val snackbarMessage = uiState.errorMessage ?: uiState.successMessage
     val isErrorSnackbar = uiState.errorMessage != null
-    val modelServiceLabel = taskModelServiceLabel(
-        selectedModelId = uiState.selectedLlmModelId,
-        selectedModelName = uiState.selectedLlmName
-    )
+    val modelServiceLabel = uiState.selectedLlmName
 
     LaunchedEffect(taskId) {
         if (taskId == null) {
@@ -176,10 +172,7 @@ internal fun TaskEditScreen(
                 if (modelServiceLabel.isNotBlank()) {
                     item(key = TASK_MODEL_SERVICE_ITEM_KEY) {
                         Text(
-                            text = stringResource(
-                                R.string.task_decomposition_service_hint,
-                                modelServiceLabel
-                            ),
+                            text = modelServiceLabel,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -235,15 +228,3 @@ private fun Rect.contains(other: Rect): Boolean =
             other.top >= top &&
             other.right <= right &&
             other.bottom <= bottom
-
-@Composable
-private fun taskModelServiceLabel(
-    selectedModelId: String,
-    selectedModelName: String
-): String {
-    return if (selectedModelId == LlmSettings.GIGACHAT_MODEL_ID) {
-        stringResource(R.string.task_decomposition_gigachat_service, selectedModelName)
-    } else {
-        stringResource(R.string.task_decomposition_custom_service, selectedModelName)
-    }
-}

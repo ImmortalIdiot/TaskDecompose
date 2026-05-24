@@ -53,7 +53,7 @@ class HistoryViewModelTest {
 
         assertFalse(state.isLoading)
         assertEquals(listOf("Сегодня", "Вчера"), state.groups.map { it.date })
-        assertEquals(listOf("newer", "sameDay"), state.groups.first().tasks.map { it.id })
+        assertEquals(listOf("newer", "sameDay"), state.groups.first().tasks.map { it.task.id })
     }
 
     /**

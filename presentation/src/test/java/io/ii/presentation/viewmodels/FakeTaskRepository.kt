@@ -2,6 +2,7 @@ package io.ii.presentation.viewmodels
 
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
 import io.ii.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,10 @@ class FakeTaskRepository : TaskRepository {
         private set
 
     var tasksById: Map<String, Task> = emptyMap()
-    private val history = MutableStateFlow<List<Task>>(emptyList())
+    var updatedTaskLlmModelName: String? = null
+        private set
+
+    private val history = MutableStateFlow<List<TaskHistoryItem>>(emptyList())
 
     override suspend fun decomposeTask(
         taskTitle: String,
@@ -42,12 +46,16 @@ class FakeTaskRepository : TaskRepository {
         return decomposedTask
     }
 
-    override fun loadDecompositionHistory(): Flow<List<Task>> = history
+    override fun loadDecompositionHistory(): Flow<List<TaskHistoryItem>> = history
 
     override suspend fun getTaskById(id: String): Task? = tasksById[id]
 
-    override suspend fun updateTask(task: Task) {
+    override suspend fun updateTask(
+        task: Task,
+        llmModelName: String?
+    ) {
         updatedTask = task
+        updatedTaskLlmModelName = llmModelName
     }
 
     override suspend fun deleteTask(id: String) {
@@ -59,7 +67,19 @@ class FakeTaskRepository : TaskRepository {
      * Публикует новый список задач в поток истории.
      */
     fun emitHistory(tasks: List<Task>) {
-        history.value = tasks
+        history.value = tasks.map { task ->
+            TaskHistoryItem(
+                task = task,
+                llmModelName = null
+            )
+        }
+    }
+
+    /**
+     * Публикует новый список элементов истории в поток истории.
+     */
+    fun emitHistoryItems(items: List<TaskHistoryItem>) {
+        history.value = items
     }
 
     /**

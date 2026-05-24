@@ -1,7 +1,6 @@
 package io.ii.presentation.states
 
 import io.ii.domain.model.DecompositionParams
-import io.ii.domain.model.LlmSettings
 import kotlin.String
 
 /**
@@ -20,7 +19,6 @@ import kotlin.String
  * @property subtasks список вложенных подзадач
  * @property depth глубина декомпозиции
  * @property hasPriority учитывать ли приоритетность подзадач
- * @property selectedLlmModelId идентификатор модели, выбранной для декомпозиции
  * @property selectedLlmName название выбранной модели или пользовательского профиля
  * @property isLoading выполняется ли запрос декомпозиции
  * @property errorMessage текст ошибки
@@ -35,8 +33,7 @@ internal data class TaskEditorUiState(
 
     val depth: Int = DEFAULT_DEPTH,
     val hasPriority: Boolean = false,
-    val selectedLlmModelId: String = LlmSettings.GIGACHAT_MODEL_ID,
-    val selectedLlmName: String = LlmSettings.DEFAULT_GIGACHAT_MODEL,
+    val selectedLlmName: String = "",
 
     val isLoading: Boolean = false,
     val errorMessage: String? = null,

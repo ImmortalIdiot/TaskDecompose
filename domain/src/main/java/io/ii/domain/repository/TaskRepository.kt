@@ -2,6 +2,7 @@ package io.ii.domain.repository
 
 import io.ii.domain.model.DecompositionParams
 import io.ii.domain.model.Task
+import io.ii.domain.model.TaskHistoryItem
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -34,9 +35,9 @@ interface TaskRepository {
     /**
      * Загружает историю декомпозированных задач.
      *
-     * @return список ранее сохранённых задач
+     * @return список ранее сохранённых задач с метаданными истории
      */
-    fun loadDecompositionHistory(): Flow<List<Task>>
+    fun loadDecompositionHistory(): Flow<List<TaskHistoryItem>>
 
     /**
      * Получает задачу по её идентификатору.
@@ -52,8 +53,12 @@ interface TaskRepository {
      * Используется для обновления существующей задачи.
      *
      * @param task задача для сохранения
+     * @param llmModelName название модели, использованной для декомпозиции
      */
-    suspend fun updateTask(task: Task)
+    suspend fun updateTask(
+        task: Task,
+        llmModelName: String?
+    )
 
     /**
      * Удаляет задачу по её идентификатору.

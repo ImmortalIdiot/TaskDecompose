@@ -14,7 +14,7 @@ internal data class HistoryUiState(
     val errorMessage: String? = null
 ) {
     val taskIds: Set<String>
-        get() = groups.flatMap { group -> group.tasks.map { task -> task.id } }.toSet()
+        get() = groups.flatMap { group -> group.tasks.map { item -> item.task.id } }.toSet()
 
     val hasTasks: Boolean
         get() = taskIds.isNotEmpty()
@@ -34,5 +34,16 @@ internal data class HistoryUiState(
  */
 internal data class HistoryDateGroupUiState(
     val date: String,
-    val tasks: List<SubtaskState>
+    val tasks: List<HistoryTaskUiState>
+)
+
+/**
+ * UI state карточки истории.
+ *
+ * @property task корневая задача с подзадачами
+ * @property llmModelName название модели, использованной для декомпозиции
+ */
+internal data class HistoryTaskUiState(
+    val task: SubtaskState,
+    val llmModelName: String?
 )

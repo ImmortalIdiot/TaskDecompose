@@ -43,11 +43,11 @@ class TaskMapperTest {
             )
         )
 
-        val entities = task.toEntities()
+        val entities = task.toEntities(llmModelName = "Mistral")
 
         assertEquals(
             listOf(
-                TaskEntity("root", null, "Root", "Description", 1L),
+                TaskEntity("root", null, "Root", "Description", 1L, "Mistral"),
                 TaskEntity("child", "root", "Child", null, 2L),
                 TaskEntity("grandchild", "child", "Grandchild", null, 3L)
             ),
@@ -60,18 +60,20 @@ class TaskMapperTest {
      * а вложенные элементы попадают в соответствующие поддеревья.
      */
     @Test
-    fun `toModelTree restores only root tasks with nested children`() {
+    fun `toHistoryModelTree restores only root tasks with nested children and history metadata`() {
         val entities = listOf(
             TaskEntity("orphan", "missing", "Orphan", null, 9L),
             TaskEntity("child2", "root", "Child 2", null, 3L),
-            TaskEntity("root", null, "Root", "Description", 1L),
+            TaskEntity("root", null, "Root", "Description", 1L, "GigaChat-Max"),
             TaskEntity("child1", "root", "Child 1", null, 2L),
             TaskEntity("secondRoot", null, "Second root", null, 4L)
         )
 
-        val tasks = entities.toModelTree()
+        val historyItems = entities.toHistoryModelTree()
+        val tasks = historyItems.map { item -> item.task }
 
         assertEquals(listOf("root", "secondRoot"), tasks.map { it.id })
+        assertEquals("GigaChat-Max", historyItems.first().llmModelName)
         assertEquals(listOf("child2", "child1"), tasks.first().subtasks.map { it.id })
         assertEquals(emptyList<Task>(), tasks.last().subtasks)
     }

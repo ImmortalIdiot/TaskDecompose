@@ -103,22 +103,23 @@ internal fun HistoryScreen(
 
                         items(
                             items = group.tasks,
-                            key = { task -> task.id }
-                        ) { task ->
+                            key = { item -> item.task.id }
+                        ) { item ->
                             HistoryItemCard(
-                                title = task.title,
-                                description = task.description,
-                                subtasks = task.subtasks,
-                                isSelected = task.id in uiState.selectedTaskIds,
+                                title = item.task.title,
+                                description = item.task.description,
+                                llmModelName = item.llmModelName,
+                                subtasks = item.task.subtasks,
+                                isSelected = item.task.id in uiState.selectedTaskIds,
                                 onItemClick = {
                                     if (uiState.hasSelection) {
-                                        viewModel.toggleTaskSelection(task.id)
+                                        viewModel.toggleTaskSelection(item.task.id)
                                     } else {
-                                        onTaskClick(task.id)
+                                        onTaskClick(item.task.id)
                                     }
                                 },
                                 onItemLongClick = {
-                                    viewModel.toggleTaskSelection(task.id)
+                                    viewModel.toggleTaskSelection(item.task.id)
                                 }
                             )
                         }
