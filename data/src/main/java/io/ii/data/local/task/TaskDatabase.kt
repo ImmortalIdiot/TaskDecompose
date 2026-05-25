@@ -13,7 +13,7 @@ import io.ii.data.local.task.entity.TaskEntity
  */
 @Database(
     entities = [TaskEntity::class],
-    version = 2
+    version = 3
 )
 internal abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao() : TaskDao
@@ -27,6 +27,17 @@ internal abstract class TaskDatabase : RoomDatabase() {
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE tasks ADD COLUMN llm_model_name TEXT")
+            }
+        }
+
+        /**
+         * Добавляет флаг завершения задачи.
+         *
+         * Все существующие и новые задачи по умолчанию считаются незавершенными.
+         */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE tasks ADD COLUMN is_completed INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

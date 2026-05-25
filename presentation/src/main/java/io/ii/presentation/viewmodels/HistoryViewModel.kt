@@ -3,10 +3,15 @@ package io.ii.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import io.ii.domain.usecase.DeleteTaskUseCase
 import io.ii.domain.usecase.LoadDecompositionHistoryUseCase
+import io.ii.domain.usecase.UpdateTaskUseCase
 import io.ii.presentation.core.launchSafe
 import io.ii.presentation.states.HistoryDateGroupUiState
+import io.ii.presentation.states.HistoryTaskUiState
 import io.ii.presentation.states.HistoryUiState
+import io.ii.presentation.utils.setAllCompleted
+import io.ii.presentation.utils.toDomain
 import io.ii.presentation.utils.toHistoryTaskUiState
+import io.ii.presentation.utils.updateCompletedCascade
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +33,7 @@ import java.util.Locale
 internal class HistoryViewModel(
     private val loadDecompositionHistoryUseCase: LoadDecompositionHistoryUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val updateTaskUseCase: UpdateTaskUseCase,
     private val clock: Clock = Clock.systemDefaultZone()
 ) : ViewModel() {
 
@@ -130,6 +136,61 @@ internal class HistoryViewModel(
             }
         }
     }
+
+    fun onRootCompletedChange(
+        rootTaskId: String,
+        isCompleted: Boolean
+    ) {
+        val task = findTask(rootTaskId) ?: return
+        saveHistoryTask(
+            task.copy(
+                task = task.task.copy(
+                    isCompleted = isCompleted,
+                    subtasks = task.task.subtasks.setAllCompleted(isCompleted)
+                )
+            )
+        )
+    }
+
+    fun onSubtaskCompletedChange(
+        rootTaskId: String,
+        subtaskId: String,
+        isCompleted: Boolean
+    ) {
+        val task = findTask(rootTaskId) ?: return
+        saveHistoryTask(
+            task.copy(
+                task = task.task.copy(
+                    subtasks = task.task.subtasks.updateCompletedCascade(
+                        id = subtaskId,
+                        isCompleted = isCompleted
+                    )
+                )
+            )
+        )
+    }
+
+    private fun saveHistoryTask(task: HistoryTaskUiState) {
+        launchSafe(
+            onError = { error ->
+                _uiState.update { state ->
+                    state.copy(errorMessage = error.localizedMessage.orEmpty())
+                }
+            }
+        ) {
+            updateTaskUseCase(
+                UpdateTaskUseCase.Params(
+                    task = task.task.toDomain(),
+                    llmModelName = task.llmModelName
+                )
+            )
+        }
+    }
+
+    private fun findTask(taskId: String): HistoryTaskUiState? =
+        _uiState.value.groups
+            .flatMap { group -> group.tasks }
+            .firstOrNull { task -> task.task.id == taskId }
 
     /**
      * Преобразует timestamp в локальную дату устройства.

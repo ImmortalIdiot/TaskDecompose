@@ -15,7 +15,8 @@ import androidx.room.PrimaryKey
  * @param title текст задачи;
  * @param description возможное описание задачи;
  * @param createdAt дата создания задачи;
- * @param llmModelName название модели, использованной для декомпозиции.
+ * @param llmModelName название модели, использованной для декомпозиции;
+ * @param isCompleted завершена ли задача.
  */
 @Entity(
     tableName = "tasks",
@@ -34,5 +35,6 @@ internal data class TaskEntity(
     val title: String,
     val description: String?,
     @ColumnInfo(name = "created_at") val createdAt: Long,
-    @ColumnInfo(name = "llm_model_name") val llmModelName: String? = null
+    @ColumnInfo(name = "llm_model_name") val llmModelName: String? = null,
+    @ColumnInfo(name = "is_completed") val isCompleted: Boolean = false
 )

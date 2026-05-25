@@ -31,7 +31,8 @@ class ModelMapperTest {
                     id = "child",
                     title = "Child",
                     description = "Child description",
-                    createdAt = 2L
+                    createdAt = 2L,
+                    isCompleted = true
                 )
             )
         )
@@ -42,6 +43,7 @@ class ModelMapperTest {
         assertEquals("", state.description)
         assertEquals("child", state.subtasks.single().id)
         assertEquals("Child description", state.subtasks.single().description)
+        assertEquals(true, state.subtasks.single().isCompleted)
     }
 
     /**
@@ -69,9 +71,11 @@ class ModelMapperTest {
                     id = "child",
                     title = "Child",
                     description = "Description",
-                    createdAt = 2L
+                    createdAt = 2L,
+                    isCompleted = true
                 )
-            )
+            ),
+            isCompleted = true
         )
 
         val task = state.toDomain()
@@ -79,6 +83,8 @@ class ModelMapperTest {
         assertEquals("root", task?.id)
         assertNull(task?.description)
         assertEquals("child", task?.subtasks?.single()?.id)
+        assertEquals(true, task?.isCompleted)
+        assertEquals(true, task?.subtasks?.single()?.isCompleted)
     }
 
     /**

@@ -50,7 +50,10 @@ internal fun HistoryItemCard(
     description: String?,
     llmModelName: String?,
     subtasks: List<SubtaskState>,
+    isCompleted: Boolean,
     isSelected: Boolean,
+    onRootCompletedChange: (Boolean) -> Unit,
+    onSubtaskCompletedChange: (String, Boolean) -> Unit,
     onItemClick: () -> Unit,
     onItemLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -104,6 +107,9 @@ internal fun HistoryItemCard(
                     TaskTreeCard(
                         modifier = Modifier.fillMaxWidth(),
                         rootTitle = title,
+                        rootIsCompleted = isCompleted,
+                        onRootCompletedChange = onRootCompletedChange,
+                        onSubtaskCompletedChange = onSubtaskCompletedChange,
                         animationSpeedCoefficient = 4f,
                         enableTypingAnimation = false,
                         subtasks = subtasks
@@ -210,7 +216,10 @@ private fun HistoryItemCardPreview() {
                     title = taskText,
                     description = null,
                     llmModelName = "GigaChat",
+                    isCompleted = false,
                     isSelected = false,
+                    onRootCompletedChange = {},
+                    onSubtaskCompletedChange = { _, _ -> },
                     onItemClick = {},
                     onItemLongClick = {},
                     subtasks = Constants.MOCK_SUBTASKS
@@ -220,7 +229,10 @@ private fun HistoryItemCardPreview() {
                     title = taskText,
                     description = LoremIpsum(100).values.first(),
                     llmModelName = "Mistral",
+                    isCompleted = true,
                     isSelected = true,
+                    onRootCompletedChange = {},
+                    onSubtaskCompletedChange = { _, _ -> },
                     onItemClick = {},
                     onItemLongClick = {},
                     subtasks = Constants.MOCK_SUBTASKS

@@ -19,7 +19,8 @@ internal fun Task.toEditorUiState(): TaskEditorUiState =
         title = title,
         description = description.orEmpty(),
         createdAt = createdAt,
-        subtasks = subtasks.map { it.toEditorItemUiState() }
+        subtasks = subtasks.map { it.toEditorItemUiState() },
+        isCompleted = isCompleted
     )
 
 /**
@@ -35,7 +36,8 @@ internal fun Task.toEditorItemUiState(): SubtaskState =
         title = title,
         description = description,
         createdAt = createdAt,
-        subtasks = subtasks.map { it.toEditorItemUiState() }
+        subtasks = subtasks.map { it.toEditorItemUiState() },
+        isCompleted = isCompleted
     )
 
 /**
@@ -58,7 +60,8 @@ internal fun TaskEditorUiState.toDomain(): Task? {
         title = title,
         description = description.takeIf { it.isNotBlank() },
         createdAt = taskCreatedAt,
-        subtasks = subtasks.map { it.toDomain() }
+        subtasks = subtasks.map { it.toDomain() },
+        isCompleted = isCompleted
     )
 }
 
@@ -86,5 +89,6 @@ internal fun SubtaskState.toDomain(): Task =
         title = title,
         description = description,
         createdAt = createdAt,
-        subtasks = subtasks.map { it.toDomain() }
+        subtasks = subtasks.map { it.toDomain() },
+        isCompleted = isCompleted
     )

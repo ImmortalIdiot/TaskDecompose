@@ -3,6 +3,7 @@ package io.ii.presentation.viewmodels
 import io.ii.domain.model.Task
 import io.ii.domain.usecase.DeleteTaskUseCase
 import io.ii.domain.usecase.LoadDecompositionHistoryUseCase
+import io.ii.domain.usecase.UpdateTaskUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -115,9 +116,56 @@ class HistoryViewModelTest {
         assertEquals(emptySet<String>(), viewModel.uiState.value.selectedTaskIds)
     }
 
+    /**
+     * Проверяет, что изменение завершённости из истории сохраняет корневую задачу и вложенную подзадачу.
+     */
+    @Test
+    fun `completion changes from history are saved`() = runTest {
+        val repository = FakeTaskRepository()
+        val viewModel = viewModel(repository)
+
+        repository.emitHistory(
+            listOf(
+                Task(
+                    id = "root",
+                    title = "Root",
+                    description = null,
+                    createdAt = timestamp("2026-01-02T09:00:00Z"),
+                    subtasks = listOf(
+                        Task(
+                            id = "child",
+                            title = "Child",
+                            description = null,
+                            createdAt = timestamp("2026-01-02T09:01:00Z"),
+                            subtasks = listOf(
+                                Task(
+                                    id = "nested",
+                                    title = "Nested",
+                                    description = null,
+                                    createdAt = timestamp("2026-01-02T09:02:00Z")
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        viewModel.onRootCompletedChange("root", true)
+        waitUntil { repository.updatedTask?.isCompleted == true }
+        assertEquals(true, repository.updatedTask?.subtasks?.single()?.isCompleted)
+        assertEquals(true, repository.updatedTask?.subtasks?.single()?.subtasks?.single()?.isCompleted)
+        viewModel.onSubtaskCompletedChange("root", "child", true)
+        waitUntil { repository.updatedTask?.subtasks?.single()?.isCompleted == true }
+
+        assertEquals("root", repository.updatedTask?.id)
+        assertEquals(true, repository.updatedTask?.subtasks?.single()?.isCompleted)
+        assertEquals(true, repository.updatedTask?.subtasks?.single()?.subtasks?.single()?.isCompleted)
+    }
+
     private fun viewModel(repository: FakeTaskRepository) = HistoryViewModel(
         loadDecompositionHistoryUseCase = LoadDecompositionHistoryUseCase(repository),
         deleteTaskUseCase = DeleteTaskUseCase(repository),
+        updateTaskUseCase = UpdateTaskUseCase(repository),
         clock = clock
     )
 

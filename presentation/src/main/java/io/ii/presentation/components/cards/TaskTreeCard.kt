@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastRoundToInt
@@ -67,6 +69,9 @@ internal fun TaskTreeCard(
     rootTitle: String,
     subtasks: List<SubtaskState>,
     modifier: Modifier = Modifier,
+    rootIsCompleted: Boolean = false,
+    onRootCompletedChange: ((Boolean) -> Unit)? = null,
+    onSubtaskCompletedChange: ((String, Boolean) -> Unit)? = null,
     enableTypingAnimation: Boolean = true,
     animationSpeedCoefficient: Float = 1f
 ) {
@@ -106,13 +111,18 @@ internal fun TaskTreeCard(
                 start = dimensions.padding.paddingS
             )
         ) {
-            TaskTreeRootItem(title = rootTitle)
+            TaskTreeRootItem(
+                title = rootTitle,
+                isCompleted = rootIsCompleted,
+                onCompletedChange = onRootCompletedChange
+            )
 
             nodes.forEach { node ->
                 AnimatedTaskTreeItem(
                     node = node,
                     shouldAnimate = shouldAnimate,
-                    animationSpeedCoefficient = animationSpeed
+                    animationSpeedCoefficient = animationSpeed,
+                    onCompletedChange = onSubtaskCompletedChange
                 )
             }
         }
@@ -131,6 +141,7 @@ private fun AnimatedTaskTreeItem(
     node: TaskTreeNodeUi,
     shouldAnimate: Boolean,
     animationSpeedCoefficient: Int,
+    onCompletedChange: ((String, Boolean) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     var visible by remember(node.item.id, shouldAnimate) { mutableStateOf(!shouldAnimate) }
@@ -160,7 +171,8 @@ private fun AnimatedTaskTreeItem(
             parentContinuations = node.parentContinuations,
             isLast = node.isLast,
             enableTypingAnimation = shouldAnimate,
-            animationSpeedCoefficient = animationSpeedCoefficient
+            animationSpeedCoefficient = animationSpeedCoefficient,
+            onCompletedChange = onCompletedChange
         )
     }
 }
@@ -172,6 +184,7 @@ private fun TaskTreeItemRow(
     isLast: Boolean,
     enableTypingAnimation: Boolean,
     animationSpeedCoefficient: Int,
+    onCompletedChange: ((String, Boolean) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
@@ -188,6 +201,13 @@ private fun TaskTreeItemRow(
             isLast = isLast
         )
 
+        Checkbox(
+            checked = item.isCompleted,
+            onCheckedChange = { checked ->
+                onCompletedChange?.invoke(item.id, checked)
+            }
+        )
+
         val textModifier = Modifier
             .weight(1f)
             .padding(
@@ -201,14 +221,24 @@ private fun TaskTreeItemRow(
                 text = item.title,
                 animationSpeedCoefficient = animationSpeedCoefficient,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = if (item.isCompleted) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                textDecoration = item.completedTextDecoration()
             )
         } else {
             Text(
                 modifier = textModifier,
                 text = item.title,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = if (item.isCompleted) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                textDecoration = item.completedTextDecoration()
             )
         }
     }
@@ -220,6 +250,7 @@ private fun TypewriterText(
     animationSpeedCoefficient: Int,
     style: TextStyle,
     color: Color,
+    textDecoration: TextDecoration?,
     modifier: Modifier = Modifier
 ) {
     var visibleCharacters by remember(text) { mutableIntStateOf(0) }
@@ -237,13 +268,15 @@ private fun TypewriterText(
         Text(
             text = text,
             style = style,
-            color = Color.Transparent
+            color = Color.Transparent,
+            textDecoration = textDecoration
         )
 
         Text(
             text = text.take(visibleCharacters),
             style = style,
-            color = color
+            color = color,
+            textDecoration = textDecoration
         )
     }
 }
@@ -287,6 +320,8 @@ private fun List<SubtaskState>.animationKey(): String =
                 append(item.id)
                 append(':')
                 append(item.title)
+                append(':')
+                append(item.isCompleted)
                 append('|')
                 appendItems(item.subtasks)
             }
@@ -298,15 +333,38 @@ private fun List<SubtaskState>.animationKey(): String =
 @Composable
 private fun TaskTreeRootItem(
     title: String,
+    isCompleted: Boolean,
+    onCompletedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    Text(
+    Row(
         modifier = modifier.fillMaxWidth(),
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onSurface
-    )
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = isCompleted,
+            onCheckedChange = onCompletedChange
+        )
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = if (isCompleted) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            textDecoration = isCompleted.completedTextDecoration()
+        )
+    }
 }
+
+private fun SubtaskState.completedTextDecoration(): TextDecoration? =
+    isCompleted.completedTextDecoration()
+
+private fun Boolean.completedTextDecoration(): TextDecoration? =
+    if (this) TextDecoration.LineThrough else null
 
 @Composable
 private fun TaskTreeLines(

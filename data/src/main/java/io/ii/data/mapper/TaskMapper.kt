@@ -25,7 +25,8 @@ internal fun Task.toEntity(
         title = title,
         description = description,
         createdAt = createdAt,
-        llmModelName = llmModelName.takeIf { parentId == null }
+        llmModelName = llmModelName.takeIf { parentId == null },
+        isCompleted = isCompleted
     )
 
 /**
@@ -136,7 +137,8 @@ private fun TaskEntity.toModel(
                     visitedIds = newVisitedIds
                 )
             }
-            .orEmpty()
+            .orEmpty(),
+        isCompleted = isCompleted
     )
 }
 

@@ -183,6 +183,47 @@ class TaskEditViewModelTest {
     }
 
     /**
+     * Проверяет, что отметки завершения корневой задачи и вложенной подзадачи сохраняются в domain-модель.
+     */
+    @Test
+    fun `completion changes are included when task is saved`() = runTest {
+        repository.tasksById = mapOf(
+            "TaskId" to persistedTask().copy(
+                subtasks = listOf(
+                    Task(
+                        id = "SubtaskId",
+                        title = "Subtask",
+                        description = null,
+                        createdAt = 2L,
+                        subtasks = listOf(
+                            Task(
+                                id = "NestedSubtaskId",
+                                title = "Nested subtask",
+                                description = null,
+                                createdAt = 3L
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        val viewModel = viewModel()
+
+        viewModel.loadTask("TaskId")
+        waitUntil { viewModel.uiState.value.id == "TaskId" }
+        viewModel.onRootCompletedChange(true)
+        assertEquals(true, viewModel.uiState.value.subtasks.single().isCompleted)
+        assertEquals(true, viewModel.uiState.value.subtasks.single().subtasks.single().isCompleted)
+        viewModel.onSubtaskCompletedChange("SubtaskId", true)
+        viewModel.saveTask()
+        waitUntil { viewModel.uiState.value.successMessage == "Saved" }
+
+        assertEquals(true, repository.updatedTask?.isCompleted)
+        assertEquals(true, repository.updatedTask?.subtasks?.single()?.isCompleted)
+        assertEquals(true, repository.updatedTask?.subtasks?.single()?.subtasks?.single()?.isCompleted)
+    }
+
+    /**
      * Проверяет, что удаление существующей задачи вызывает use case удаления
      * и возвращает редактор в начальное состояние с сообщением об успехе.
      */

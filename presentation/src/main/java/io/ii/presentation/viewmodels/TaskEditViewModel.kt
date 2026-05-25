@@ -13,8 +13,10 @@ import io.ii.presentation.core.ResourceProvider
 import io.ii.presentation.core.launchSafe
 import io.ii.presentation.states.TaskEditorUiState
 import io.ii.presentation.utils.LoggingTags
+import io.ii.presentation.utils.setAllCompleted
 import io.ii.presentation.utils.toDomain
 import io.ii.presentation.utils.toEditorUiState
+import io.ii.presentation.utils.updateCompletedCascade
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -170,6 +172,7 @@ internal class TaskEditViewModel(
             val updatedTaskState = decomposedTask.copy(
                 id = state.id ?: decomposedTask.id,
                 createdAt = state.createdAt ?: decomposedTask.createdAt,
+                isCompleted = state.isCompleted,
                 depth = state.depth,
                 hasPriority = state.hasPriority
             ).withLlmSettings(llmSettings)
@@ -351,6 +354,26 @@ internal class TaskEditViewModel(
 
     fun onPriorityChange(value: Boolean) {
         _uiState.update { state -> state.copy(hasPriority = value) }
+    }
+
+    fun onRootCompletedChange(value: Boolean) {
+        _uiState.update { state ->
+            state.copy(
+                isCompleted = value,
+                subtasks = state.subtasks.setAllCompleted(value)
+            )
+        }
+    }
+
+    fun onSubtaskCompletedChange(id: String, value: Boolean) {
+        _uiState.update { state ->
+            state.copy(
+                subtasks = state.subtasks.updateCompletedCascade(
+                    id = id,
+                    isCompleted = value
+                )
+            )
+        }
     }
 
     companion object {

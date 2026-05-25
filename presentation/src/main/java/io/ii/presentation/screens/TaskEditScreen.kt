@@ -194,7 +194,10 @@ internal fun TaskEditScreen(
                         TaskTreeCard(
                             modifier = Modifier.fillMaxWidth(),
                             rootTitle = uiState.title,
-                            subtasks = uiState.subtasks
+                            subtasks = uiState.subtasks,
+                            rootIsCompleted = uiState.isCompleted,
+                            onRootCompletedChange = viewModel::onRootCompletedChange,
+                            onSubtaskCompletedChange = viewModel::onSubtaskCompletedChange
                         )
                     }
                 }

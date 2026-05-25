@@ -31,6 +31,7 @@ class TaskMapperTest {
                     title = "Child",
                     description = null,
                     createdAt = 2L,
+                    isCompleted = true,
                     subtasks = listOf(
                         Task(
                             id = "grandchild",
@@ -48,7 +49,7 @@ class TaskMapperTest {
         assertEquals(
             listOf(
                 TaskEntity("root", null, "Root", "Description", 1L, "Mistral"),
-                TaskEntity("child", "root", "Child", null, 2L),
+                TaskEntity("child", "root", "Child", null, 2L, isCompleted = true),
                 TaskEntity("grandchild", "child", "Grandchild", null, 3L)
             ),
             entities
@@ -85,7 +86,7 @@ class TaskMapperTest {
     fun `toModel returns selected subtree`() {
         val entities = listOf(
             TaskEntity("root", null, "Root", null, 1L),
-            TaskEntity("child", "root", "Child", null, 2L),
+            TaskEntity("child", "root", "Child", null, 2L, isCompleted = true),
             TaskEntity("other", null, "Other", null, 3L)
         )
 
@@ -93,6 +94,7 @@ class TaskMapperTest {
 
         assertEquals("root", task?.id)
         assertEquals(listOf("child"), task?.subtasks?.map { it.id })
+        assertEquals(true, task?.subtasks?.single()?.isCompleted)
     }
 
     /**

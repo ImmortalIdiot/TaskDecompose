@@ -17,6 +17,7 @@ import kotlin.String
  * @property description описание задачи
  * @property createdAt время создания задачи в формате timestamp
  * @property subtasks список вложенных подзадач
+ * @property isCompleted завершена ли задача
  * @property depth глубина декомпозиции
  * @property hasPriority учитывать ли приоритетность подзадач
  * @property selectedLlmName название выбранной модели или пользовательского профиля
@@ -30,6 +31,7 @@ internal data class TaskEditorUiState(
     val description: String = "",
     val createdAt: Long? = null,
     val subtasks: List<SubtaskState> = emptyList(),
+    val isCompleted: Boolean = false,
 
     val depth: Int = DEFAULT_DEPTH,
     val hasPriority: Boolean = false,

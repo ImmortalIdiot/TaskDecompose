@@ -110,7 +110,21 @@ internal fun HistoryScreen(
                                 description = item.task.description,
                                 llmModelName = item.llmModelName,
                                 subtasks = item.task.subtasks,
+                                isCompleted = item.task.isCompleted,
                                 isSelected = item.task.id in uiState.selectedTaskIds,
+                                onRootCompletedChange = { isCompleted ->
+                                    viewModel.onRootCompletedChange(
+                                        rootTaskId = item.task.id,
+                                        isCompleted = isCompleted
+                                    )
+                                },
+                                onSubtaskCompletedChange = { subtaskId, isCompleted ->
+                                    viewModel.onSubtaskCompletedChange(
+                                        rootTaskId = item.task.id,
+                                        subtaskId = subtaskId,
+                                        isCompleted = isCompleted
+                                    )
+                                },
                                 onItemClick = {
                                     if (uiState.hasSelection) {
                                         viewModel.toggleTaskSelection(item.task.id)
