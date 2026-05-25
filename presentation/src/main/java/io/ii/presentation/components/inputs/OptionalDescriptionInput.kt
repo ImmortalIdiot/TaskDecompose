@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,6 +39,7 @@ internal fun OptionalDescriptionInput(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onValueChange: (String) -> Unit,
+    onVoiceInputClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
@@ -84,7 +87,15 @@ internal fun OptionalDescriptionInput(
                     },
                     minLines = 3,
                     maxLines = 7,
-                    colors = TaskDecomposeComponentDefaults.textFieldColors()
+                    colors = TaskDecomposeComponentDefaults.textFieldColors(),
+                    trailingIcon = {
+                        IconButton(onClick = onVoiceInputClick) {
+                            Icon(
+                                imageVector = Icons.Outlined.Mic,
+                                contentDescription = null
+                            )
+                        }
+                    }
                 )
             }
         }
@@ -109,25 +120,29 @@ private fun OptionalDescriptionInputPreview() {
                     value = "",
                     expanded = false,
                     onExpandedChange = {},
-                    onValueChange = {}
+                    onValueChange = {},
+                    onVoiceInputClick = {}
                 )
                 OptionalDescriptionInput(
                     value = "",
                     expanded = true,
                     onExpandedChange = {},
-                    onValueChange = {}
+                    onValueChange = {},
+                    onVoiceInputClick = {}
                 )
                 OptionalDescriptionInput(
                     value = "task description text",
                     expanded = false,
                     onExpandedChange = {},
-                    onValueChange = {}
+                    onValueChange = {},
+                    onVoiceInputClick = {}
                 )
                 OptionalDescriptionInput(
                     value = input,
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
-                    onValueChange = { input = it }
+                    onValueChange = { input = it },
+                    onVoiceInputClick = {}
                 )
             }
         }

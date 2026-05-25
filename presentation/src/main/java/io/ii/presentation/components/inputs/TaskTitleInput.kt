@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,6 +37,7 @@ internal fun TaskTitleInput(
     isLoading: Boolean,
     onValueChange: (String) -> Unit,
     onDecomposeClick: () -> Unit,
+    onVoiceInputClick: () -> Unit,
     modifier: Modifier = Modifier,
     onDecomposeButtonBoundsChange: (Rect) -> Unit = {}
 ) {
@@ -62,20 +64,35 @@ internal fun TaskTitleInput(
             enabled = !isLoading,
             colors = TaskDecomposeComponentDefaults.textFieldColors(),
             trailingIcon = {
-                IconButton(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .onGloballyPositioned { coordinates ->
-                            onDecomposeButtonBoundsChange(coordinates.boundsInRoot())
-                        },
-                    onClick = onDecomposeClick,
-                    enabled = enabled
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        modifier = Modifier.size(dimensions.icon.iconM),
-                        imageVector = Icons.Outlined.AutoAwesome,
-                        contentDescription = null
-                    )
+                    IconButton(
+                        onClick = onVoiceInputClick,
+                        enabled = !isLoading
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(dimensions.icon.iconM),
+                            imageVector = Icons.Outlined.Mic,
+                            contentDescription = null
+                        )
+                    }
+
+                    IconButton(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .onGloballyPositioned { coordinates ->
+                                onDecomposeButtonBoundsChange(coordinates.boundsInRoot())
+                            },
+                        onClick = onDecomposeClick,
+                        enabled = enabled
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(dimensions.icon.iconM),
+                            imageVector = Icons.Outlined.AutoAwesome,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         )
@@ -100,21 +117,24 @@ private fun PreviewTaskTitleInput() {
                     value = "Текст основной задачи",
                     isLoading = false,
                     onValueChange = {},
-                    onDecomposeClick = {}
+                    onDecomposeClick = {},
+                    onVoiceInputClick = {}
                 )
 
                 TaskTitleInput(
                     value = inputValue,
                     isLoading = false,
                     onValueChange = { inputValue = it },
-                    onDecomposeClick = {}
+                    onDecomposeClick = {},
+                    onVoiceInputClick = {}
                 )
 
                 TaskTitleInput(
                     value = "Задача",
                     isLoading = true,
                     onValueChange = {},
-                    onDecomposeClick = {}
+                    onDecomposeClick = {},
+                    onVoiceInputClick = {}
                 )
             }
         }

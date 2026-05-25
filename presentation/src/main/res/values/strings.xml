@@ -18,6 +18,8 @@
     <string name="task_title_label">Задача</string>
     <string name="task_condensed_description">Описание</string>
     <string name="task_description_label">Контекст задачи</string>
+    <string name="voice_input_prompt">Говорите</string>
+    <string name="voice_input_unavailable">Распознавание речи недоступно</string>
     <string name="task_decomposition_params">Параметры декомпозиции</string>
     <string name="task_decomposition_depth">Глубина: %d</string>
     <string name="task_decomposition_priority">Учитывать приоритет</string>

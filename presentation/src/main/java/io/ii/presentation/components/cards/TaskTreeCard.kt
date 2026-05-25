@@ -601,14 +601,16 @@ private fun TaskTreeCardPreview() {
                     value = inputValue,
                     isLoading = false,
                     onValueChange = { inputValue = it },
-                    onDecomposeClick = {}
+                    onDecomposeClick = {},
+                    onVoiceInputClick = {}
                 )
 
                 OptionalDescriptionInput(
                     value = input,
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
-                    onValueChange = { input = it }
+                    onValueChange = { input = it },
+                    onVoiceInputClick = {}
                 )
 
                 DecompositionParamsCard(

@@ -1,5 +1,14 @@
 package io.ii.presentation.screens
 
+import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.ii.presentation.R
 import io.ii.presentation.components.bars.TaskEditSnackbar
@@ -39,6 +50,7 @@ import io.ii.presentation.theme.TaskDecomposeComponentDefaults
 import io.ii.presentation.viewmodels.TaskEditViewModel
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.Locale
 
 private const val TASK_TITLE_ITEM_KEY = "title"
 private const val TASK_MODEL_SERVICE_ITEM_KEY = "model_service"
@@ -47,6 +59,11 @@ private const val TASK_PARAMS_ITEM_KEY = "params"
 private const val TASK_PROGRESS_INDICATOR_ITEM_KEY = "progress_indicator"
 private const val TASK_TREE_ITEM_KEY = "task_tree"
 private const val SUCCESS_SNACKBAR_DURATION_MILLIS = 3_000L
+
+private enum class VoiceInputTarget {
+    Title,
+    Description
+}
 
 @Composable
 internal fun TaskEditScreen(
@@ -57,9 +74,11 @@ internal fun TaskEditScreen(
     viewModel: TaskEditViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var isDescriptionExpanded by rememberSaveable { mutableStateOf(false) }
     val listState = rememberLazyListState()
     var listBounds by remember { mutableStateOf<Rect?>(null) }
+    var pendingVoiceInputTarget by remember { mutableStateOf<VoiceInputTarget?>(null) }
 
     var inlineDecomposeButtonBounds by remember { mutableStateOf<Rect?>(null) }
     val showDecomposeButtonInTopBar by remember {
@@ -83,6 +102,86 @@ internal fun TaskEditScreen(
     val snackbarMessage = uiState.errorMessage ?: uiState.successMessage
     val isErrorSnackbar = uiState.errorMessage != null
     val modelServiceLabel = uiState.selectedLlmName
+
+    val speechRecognitionUnavailableMessage = stringResource(R.string.voice_input_unavailable)
+
+    fun createVoiceInputIntent(): Intent =
+        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, context.getString(R.string.voice_input_prompt))
+        }
+
+    val voiceInputLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val target = pendingVoiceInputTarget
+        pendingVoiceInputTarget = null
+
+        if (result.resultCode != Activity.RESULT_OK || target == null) {
+            return@rememberLauncherForActivityResult
+        }
+
+        val recognizedText = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+            .orEmpty()
+
+        if (recognizedText.isBlank()) {
+            return@rememberLauncherForActivityResult
+        }
+
+        when (target) {
+            VoiceInputTarget.Title -> viewModel.onTitleChange(recognizedText)
+            VoiceInputTarget.Description -> viewModel.onDescriptionChange(recognizedText)
+        }
+    }
+
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            pendingVoiceInputTarget = null
+            Toast.makeText(context, speechRecognitionUnavailableMessage, Toast.LENGTH_SHORT).show()
+            return@rememberLauncherForActivityResult
+        }
+
+        try {
+            voiceInputLauncher.launch(createVoiceInputIntent())
+        } catch (_: ActivityNotFoundException) {
+            pendingVoiceInputTarget = null
+            Toast.makeText(context, speechRecognitionUnavailableMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun startVoiceInput(target: VoiceInputTarget) {
+        pendingVoiceInputTarget = target
+        when (target) {
+            VoiceInputTarget.Title -> viewModel.onTitleChange("")
+            VoiceInputTarget.Description -> {
+                isDescriptionExpanded = true
+                viewModel.onDescriptionChange("")
+            }
+        }
+
+        if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            try {
+                voiceInputLauncher.launch(createVoiceInputIntent())
+            } catch (_: ActivityNotFoundException) {
+                pendingVoiceInputTarget = null
+                Toast.makeText(context, speechRecognitionUnavailableMessage, Toast.LENGTH_SHORT)
+                    .show()
+            }
+        } else {
+            audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
 
     LaunchedEffect(taskId) {
         if (taskId == null) {
@@ -143,6 +242,7 @@ internal fun TaskEditScreen(
                         isLoading = uiState.isLoading,
                         onValueChange = viewModel::onTitleChange,
                         onDecomposeClick = viewModel::decomposeTask,
+                        onVoiceInputClick = { startVoiceInput(VoiceInputTarget.Title) },
                         onDecomposeButtonBoundsChange = { bounds ->
                             inlineDecomposeButtonBounds = bounds
                         }
@@ -155,7 +255,8 @@ internal fun TaskEditScreen(
                         value = uiState.description,
                         expanded = isDescriptionExpanded,
                         onExpandedChange = { isDescriptionExpanded = it },
-                        onValueChange = viewModel::onDescriptionChange
+                        onValueChange = viewModel::onDescriptionChange,
+                        onVoiceInputClick = { startVoiceInput(VoiceInputTarget.Description) }
                     )
                 }
 
