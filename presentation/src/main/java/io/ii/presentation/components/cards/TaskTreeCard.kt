@@ -16,12 +16,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,6 +66,9 @@ private const val ANIMATION_DURATION = 200
  * Базовая задержка между появлением символов в typewriter-анимации.
  */
 private const val TYPEWRITER_CHARACTER_DELAY = 24L
+
+private val TASK_CHECKBOX_SIZE = 24.dp
+private val TASK_TEXT_START_PADDING = 8.dp
 
 @Composable
 internal fun TaskTreeCard(
@@ -201,7 +207,7 @@ private fun TaskTreeItemRow(
             isLast = isLast
         )
 
-        Checkbox(
+        TaskCompletionCheckbox(
             checked = item.isCompleted,
             onCheckedChange = { checked ->
                 onCompletedChange?.invoke(item.id, checked)
@@ -211,8 +217,8 @@ private fun TaskTreeItemRow(
         val textModifier = Modifier
             .weight(1f)
             .padding(
-                top = dimensions.padding.padding4,
-                bottom = dimensions.padding.paddingS
+                start = TASK_TEXT_START_PADDING,
+                bottom = dimensions.padding.padding12
             )
 
         if (enableTypingAnimation) {
@@ -320,8 +326,6 @@ private fun List<SubtaskState>.animationKey(): String =
                 append(item.id)
                 append(':')
                 append(item.title)
-                append(':')
-                append(item.isCompleted)
                 append('|')
                 appendItems(item.subtasks)
             }
@@ -337,17 +341,24 @@ private fun TaskTreeRootItem(
     onCompletedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
+    val dimensions = LocalDimensions.current
+
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
-        Checkbox(
+        TaskCompletionCheckbox(
             checked = isCompleted,
             onCheckedChange = onCompletedChange
         )
 
         Text(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    start = TASK_TEXT_START_PADDING,
+                    bottom = dimensions.padding.paddingS
+                ),
             text = title,
             style = MaterialTheme.typography.titleSmall,
             color = if (isCompleted) {
@@ -365,6 +376,21 @@ private fun SubtaskState.completedTextDecoration(): TextDecoration? =
 
 private fun Boolean.completedTextDecoration(): TextDecoration? =
     if (this) TextDecoration.LineThrough else null
+
+@Composable
+private fun TaskCompletionCheckbox(
+    checked: Boolean,
+    onCheckedChange: ((Boolean) -> Unit)?,
+    modifier: Modifier = Modifier
+) {
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides TASK_CHECKBOX_SIZE) {
+        Checkbox(
+            modifier = modifier.size(TASK_CHECKBOX_SIZE),
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
+    }
+}
 
 @Composable
 private fun TaskTreeLines(
