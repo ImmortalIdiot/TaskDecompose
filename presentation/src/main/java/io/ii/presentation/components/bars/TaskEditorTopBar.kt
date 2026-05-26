@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,11 +43,13 @@ internal fun TaskEditorTopBar(
     showCreateButton: Boolean,
     showDecomposeButton: Boolean,
     isDecomposeEnabled: Boolean,
+    isExportEnabled: Boolean,
     isSaveEnabled: Boolean,
     isDeleteEnabled: Boolean,
     onBackClick: () -> Unit,
     onCreateClick: () -> Unit,
     onDecomposeClick: () -> Unit,
+    onExportClick: () -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -90,6 +93,22 @@ internal fun TaskEditorTopBar(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
+            }
+
+            IconButton(
+                onClick = onExportClick,
+                enabled = isExportEnabled
+            ) {
+                Icon(
+                    modifier = Modifier.size(dimensions.icon.iconM),
+                    imageVector = Icons.Outlined.FileDownload,
+                    contentDescription = stringResource(R.string.export_tasks),
+                    tint = if (isExportEnabled) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
             }
 
             IconButton(
@@ -157,11 +176,13 @@ private fun TaskEditorTopBarPreview() {
                 showCreateButton = true,
                 showDecomposeButton = true,
                 isDecomposeEnabled = true,
+                isExportEnabled = true,
                 isSaveEnabled = true,
                 isDeleteEnabled = true,
                 onBackClick = {},
                 onCreateClick = {},
                 onDecomposeClick = {},
+                onExportClick = {},
                 onSaveClick = {},
                 onDeleteClick = {}
             )

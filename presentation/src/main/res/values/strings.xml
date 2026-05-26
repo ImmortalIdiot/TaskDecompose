@@ -8,6 +8,14 @@
     <string name="history_clear_selected_dialog_text">Вы уверены, что хотите очистить выбранную историю?</string>
     <string name="history_clear_confirm">Очистить</string>
     <string name="history_clear_cancel">Отмена</string>
+    <string name="export_tasks">Экспорт</string>
+    <string name="export_format_title">Формат экспорта</string>
+    <string name="export_format_txt">TXT</string>
+    <string name="export_format_json">JSON</string>
+    <string name="export_saved">Сохранено: %s</string>
+    <string name="export_open">Открыть</string>
+    <string name="export_cancel">Отмена</string>
+    <string name="export_error">Не удалось экспортировать</string>
 
     <string name="save_task_error">Задачу нельзя сохранить до декомпозиции</string>
     <string name="save_task_success">Задача обновлена</string>

@@ -39,14 +39,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.ii.presentation.R
+import io.ii.presentation.components.bars.TaskExportSnackbar
 import io.ii.presentation.components.bars.TaskEditSnackbar
 import io.ii.presentation.components.bars.TaskEditorTopBar
 import io.ii.presentation.components.cards.DecompositionParamsCard
 import io.ii.presentation.components.cards.TaskTreeCard
 import io.ii.presentation.components.inputs.OptionalDescriptionInput
 import io.ii.presentation.components.inputs.TaskTitleInput
+import io.ii.presentation.components.other.ExportFormatDialog
 import io.ii.presentation.theme.LocalDimensions
 import io.ii.presentation.theme.TaskDecomposeComponentDefaults
+import io.ii.presentation.utils.TaskExportFormat
+import io.ii.presentation.utils.TaskExportResult
+import io.ii.presentation.utils.openExportedTask
+import io.ii.presentation.utils.saveTasksExport
+import io.ii.presentation.utils.toExportableTask
 import io.ii.presentation.viewmodels.TaskEditViewModel
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
@@ -79,6 +86,9 @@ internal fun TaskEditScreen(
     val listState = rememberLazyListState()
     var listBounds by remember { mutableStateOf<Rect?>(null) }
     var pendingVoiceInputTarget by remember { mutableStateOf<VoiceInputTarget?>(null) }
+    var showExportFormatDialog by rememberSaveable { mutableStateOf(false) }
+    var exportResult by remember { mutableStateOf<TaskExportResult?>(null) }
+    var exportErrorMessage by remember { mutableStateOf<String?>(null) }
 
     var inlineDecomposeButtonBounds by remember { mutableStateOf<Rect?>(null) }
     val showDecomposeButtonInTopBar by remember {
@@ -99,11 +109,50 @@ internal fun TaskEditScreen(
     }
 
     val dimensions = LocalDimensions.current
-    val snackbarMessage = uiState.errorMessage ?: uiState.successMessage
+    val exportSavedMessage = exportResult?.let { result ->
+        stringResource(R.string.export_saved, result.displayPath)
+    }
+    val exportSnackbarMessage = exportErrorMessage ?: exportSavedMessage
+    val snackbarMessage = if (exportSnackbarMessage == null) {
+        uiState.errorMessage ?: uiState.successMessage
+    } else {
+        null
+    }
     val isErrorSnackbar = uiState.errorMessage != null
     val modelServiceLabel = uiState.selectedLlmName
 
     val speechRecognitionUnavailableMessage = stringResource(R.string.voice_input_unavailable)
+    val exportErrorText = stringResource(R.string.export_error)
+
+    fun exportTask(format: TaskExportFormat) {
+        showExportFormatDialog = false
+        exportResult = null
+        exportErrorMessage = null
+
+        val task = uiState.toExportableTask()
+        if (task == null || task.subtasks.isEmpty()) {
+            exportErrorMessage = exportErrorText
+            return
+        }
+
+        runCatching {
+            context.saveTasksExport(
+                tasks = listOf(task),
+                format = format
+            )
+        }.onSuccess { result ->
+            exportResult = result
+        }.onFailure {
+            exportErrorMessage = exportErrorText
+        }
+    }
+
+    if (showExportFormatDialog) {
+        ExportFormatDialog(
+            onFormatClick = ::exportTask,
+            onDismiss = { showExportFormatDialog = false }
+        )
+    }
 
     fun createVoiceInputIntent(): Intent =
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -209,6 +258,7 @@ internal fun TaskEditScreen(
                 showCreateButton = uiState.id != null,
                 showDecomposeButton = showDecomposeButtonInTopBar,
                 isDecomposeEnabled = uiState.canDecompose,
+                isExportEnabled = uiState.subtasks.isNotEmpty() && !uiState.isLoading,
                 isSaveEnabled = uiState.title.isNotBlank() && !uiState.isLoading,
                 isDeleteEnabled = !uiState.isLoading,
                 onBackClick = onBackClick,
@@ -217,6 +267,7 @@ internal fun TaskEditScreen(
                     onCreateClick()
                 },
                 onDecomposeClick = viewModel::decomposeTask,
+                onExportClick = { showExportFormatDialog = true },
                 onSaveClick = viewModel::saveTask,
                 onDeleteClick = viewModel::deleteTask
             )
@@ -320,6 +371,31 @@ internal fun TaskEditScreen(
                     viewModel.clearError()
                 } else {
                     viewModel.clearSuccess()
+                }
+            }
+        )
+
+        TaskExportSnackbar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    start = dimensions.padding.paddingM,
+                    end = dimensions.padding.paddingM,
+                    bottom = dimensions.padding.paddingM
+                ),
+            message = exportSnackbarMessage,
+            isError = exportErrorMessage != null,
+            onDismiss = {
+                exportErrorMessage = null
+                exportResult = null
+            },
+            actionText = exportResult?.let { stringResource(R.string.export_open) },
+            onActionClick = exportResult?.let { result ->
+                {
+                    runCatching { context.openExportedTask(result) }
+                        .onFailure {
+                            exportErrorMessage = exportErrorText
+                        }
                 }
             }
         )

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +26,9 @@ import io.ii.presentation.theme.LocalDimensions
 @Composable
 internal fun HistoryTopBar(
     showDeleteButton: Boolean = false,
+    showExportButton: Boolean = false,
     onDeleteClick: () -> Unit = {},
+    onExportClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalDimensions.current
@@ -43,6 +46,16 @@ internal fun HistoryTopBar(
             )
         },
         actions = {
+            if (showExportButton) {
+                IconButton(onClick = onExportClick) {
+                    Icon(
+                        modifier = Modifier.size(dimensions.icon.iconM),
+                        imageVector = Icons.Outlined.FileDownload,
+                        contentDescription = stringResource(R.string.export_tasks)
+                    )
+                }
+            }
+
             if (showDeleteButton) {
                 IconButton(onClick = onDeleteClick) {
                     Icon(
